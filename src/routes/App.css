@@ -1,0 +1,16 @@
+
+.frame {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.content {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.appbar {
+    flex-basis: 50px;
+}

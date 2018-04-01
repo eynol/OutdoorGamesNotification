@@ -1,5 +1,12 @@
-
-html, body, :global(#root) {
-  height: 100%;
+html,
+body,
+:global(#root) {
+    height: 100%;
 }
-
+body{
+  background-color: #eeeeee;
+}
+:global(#root) {
+  max-width: 700px;
+  margin: 0 auto;
+}

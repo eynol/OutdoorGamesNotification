@@ -1,16 +1,53 @@
 import React from 'react';
 import { connect } from 'dva';
-import styles from './IndexPage.css';
+import { Route, Link } from 'dva/router';
+import {
+  NavBar, Icon, WhiteSpace,
+  List,
+} from 'antd-mobile';
+
+
+const Item = List.Item;
+const Brief = Item.Brief;
 
 function IndexPage() {
   return (
-    <div className={styles.normal}>
-      <h1 className={styles.title}>Yay! Welcome to dva!</h1>
-      <div className={styles.welcome} />
-      <ul className={styles.list}>
-        <li>To get started, edit <code>src/index.js</code> and save to reload.</li>
-        <li><a href="https://github.com/dvajs/dva-docs/blob/master/v1/en-us/getting-started.md">Getting Started</a></li>
-      </ul>
+    <div>
+      <NavBar mode="light"
+        onLeftClick={() => console.log('onLeftClick')}
+        rightContent={[
+          <Link to="/games/new" key="0" className="iconfont icon-27CIRCLE" style={{ width: 22 }} />,
+        ]}
+      >所有游戏</NavBar>
+
+      <List className="my-list">
+        <Item
+          arrow="horizontal"
+          multipleLine
+          onClick={() => { }}
+          platform="android"
+        >
+          Title <Brief>subtitle</Brief>
+        </Item>
+        <Item
+          arrow="horizontal"
+          multipleLine
+          onClick={() => { }}
+          platform="android"
+        >
+          多益网络户外游戏Running Man （团队）<Brief>There may have water ripple effect of <br /> material if you set the click event.</Brief>
+          <Brief>重庆市南岸区崇文路2号</Brief>
+          <Brief>游戏准备中</Brief>
+        </Item>
+        <Item
+          arrow="horizontal"
+          multipleLine
+          onClick={() => { }}
+          platform="android"
+        >
+          Title <Brief>subtitle</Brief>
+        </Item>
+      </List>
     </div>
   );
 }
@@ -18,4 +55,8 @@ function IndexPage() {
 IndexPage.propTypes = {
 };
 
-export default connect()(IndexPage);
+function mapStateToProps(state) {
+  return { count: state.count };
+}
+
+export default connect(mapStateToProps)(IndexPage);
