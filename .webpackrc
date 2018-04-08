@@ -2,6 +2,10 @@
   "env": {
     "development": {
       "extraBabelPlugins": [
+         ["import", {
+            "libraryName": "antd-mobile",
+            "style": "css"
+          }],
         "dva-hmr"
       ]
     }

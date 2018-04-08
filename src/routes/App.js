@@ -4,21 +4,36 @@ import { Route, Redirect } from 'dva/router';
 import styles from './App.css';
 import AppBar from '../components/AppBar';
 
-import IndexPage from './IndexPage';
+import GamesPage from './GamesPage';
 import MessagePage from './MessagePage';
 import SettingPage from './SettingPage';
 
 import GameNewPage from './GameNewPage';
+import GameDetailPage from './GameDetailPage';
 
-function MainPage() {
+import SignInPage from './SignInPage';
+import SignUpPage from './SignUpPage';
+
+import { ActivityIndicator } from 'antd-mobile';
+
+
+function App({ loading }) {
   return (
     <div className={styles.frame}>
+      <ActivityIndicator
+        toast
+        text="Loading..."
+        animating={loading}
+      />
       <div className={styles.content}>
         <Route path="/" exact render={() => <Redirect from="/" to="/games" />} />
-        <Route path="/games" exact component={IndexPage} />
+        <Route path="/games" exact component={GamesPage} />
         <Route path="/games/new" exact component={GameNewPage} />
+        <Route path="/games/detail/:gid" exact component={GameDetailPage} />
         <Route path="/messages" exact component={MessagePage} />
         <Route path="/setting" exact component={SettingPage} />
+        <Route path="/signin" exact component={SignInPage} />
+        <Route path="/signup" exact component={SignUpPage} />
       </div>
       <div className={styles.appbar}>
         <AppBar />
@@ -27,6 +42,11 @@ function MainPage() {
   );
 }
 
+function mapStateToProps(state) {
 
+  return {
+    loading: state.loading.global,
+  }
+}
 
-export default connect()(MainPage);
+export default connect(mapStateToProps)(App);

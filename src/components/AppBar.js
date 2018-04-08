@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
 import { TabBar } from 'antd-mobile';
-import { Route, withRouter, routerRedux } from 'dva/router';
+import { withRouter, routerRedux } from 'dva/router';
 
 
 const GAME_REG = /^\/games/;
