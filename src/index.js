@@ -14,6 +14,7 @@ app.use(createLoading());
  app.model(require('./models/games').default);
  app.model(require('./models/messages').default);
  app.model(require('./models/user').default);
+ app.model(require('./models/ui').default);
 
 // 4. Router
 app.router(require('./router').default);

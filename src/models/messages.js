@@ -1,5 +1,5 @@
 import request from '../services/request';
-
+import * as ws from '../services/websocket';
 export default {
 
   namespace: 'messages',
@@ -8,6 +8,14 @@ export default {
 
   subscriptions: {
     setup({ dispatch, history }) {  // eslint-disable-line
+      return ws.listen((msg) => {
+        switch (msg.type) {
+          case "inbox": {
+            break;
+          }
+          default: break;
+        }
+      });
     },
   },
 
@@ -22,5 +30,4 @@ export default {
       return { ...state, ...action.payload };
     },
   },
-
 };

@@ -4792,6 +4792,10 @@ isomorphic-fetch@^2.1.1, isomorphic-fetch@^2.2.1:
     node-fetch "^1.0.1"
     whatwg-fetch ">=0.10.0"
 
+isomorphic-ws@^4.0.0:
+  version "4.0.0"
+  resolved "http://registry.npm.taobao.org/isomorphic-ws/download/isomorphic-ws-4.0.0.tgz#7b528b238c920eeb3f5fe429ac416df669ea4cba"
+
 isstream@~0.1.2:
   version "0.1.2"
   resolved "http://registry.npm.taobao.org/isstream/download/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
@@ -8905,6 +8909,10 @@ utila@~0.4:
 utils-merge@1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/utils-merge/download/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
+
+uuid-js@^0.7.5:
+  version "0.7.5"
+  resolved "http://registry.npm.taobao.org/uuid-js/download/uuid-js-0.7.5.tgz#6c886d02a53d2d40dcf25d91a170b4a7b25b94d0"
 
 uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
   version "3.2.1"

@@ -74,7 +74,7 @@ export default {
     },
     *updatenickname({ payload: nickname, resolve, reject }, { call, put }) {
       try {
-        const { data, err } = yield request('/api/user/updatenickname', {
+        const { err } = yield request('/api/user/updatenickname', {
           method: 'post',
           body: { nickname }
         })
@@ -96,7 +96,7 @@ export default {
     },
     *updatepassword({ payload: password, resolve, reject }, { call, put }) {
       try {
-        const { data, err } = yield request('/api/user/updatepassword', {
+        const { err } = yield request('/api/user/updatepassword', {
           method: 'post',
           body: { password }
         })
@@ -115,7 +115,7 @@ export default {
       // const { data } = yield request('/api/user/signout');
       // request websocket.
       yield put({ type: 'exit' });
-    }
+    },
   },
 
   reducers: {

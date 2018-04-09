@@ -1,7 +1,8 @@
 import request from '../services/request';
+import * as ws from '../services/websocket';
 import pathToRegexp from 'path-to-regexp';
 
-import {Toast} from 'antd-mobile';
+import { Toast } from 'antd-mobile';
 
 export default {
 
@@ -10,7 +11,9 @@ export default {
   state: {
     gaming: false,
     list: [],
-    currentGame: null
+    currentGame: null,
+    useronce: null,
+    team: [],
   },
 
   subscriptions: {
@@ -51,35 +54,35 @@ export default {
     },
     *joinGame({ payload }, { call, put }) {
 
-      const { uid, gid,admin,teamorder } = payload;
+      const { uid, gid, admin, teamorder } = payload;
       const { data } = yield request('/api/games/join');
 
-
+      ws.connect(data);
 
     },
-    *requestAssistant({payload},{call,put,race}){
-      let resolved=false;
-      const {gid,uid} = payload;
+    *requestAssistant({ payload }, { call, put, race }) {
+      let resolved = false;
+      const { gid, uid } = payload;
 
-      function* requestPermission(){
-        const {data} = yield request('/api/games/assistant',{
-          method:'post',
-          body:{gid,uid}
+      function* requestPermission() {
+        const { data } = yield request('/api/games/assistant', {
+          method: 'post',
+          body: { gid, uid }
         });
         return data;
       }
-      const delay = (time)=>new Promise((res,rej)=>{
-        setTimeout(()=>{
+      const delay = (time) => new Promise((res, rej) => {
+        setTimeout(() => {
           res();
-        },time)
+        }, time)
       });
-      const {permission, timeout} = yield race({
-        permission   : call(requestPermission),
-        timeout : call(delay, 10000)
-      })
-      if(permission){
-        yield put({type:'joinGame',payload:{gid,uid,admin:1}})
-      }else{
+      const { permission, timeout } = yield race({
+        permission: call(requestPermission),
+        timeout: call(delay, 10000)
+      });
+      if (permission) {
+        yield put({ type: 'joinGame', payload: { gid, uid, admin: 1 } })
+      } else {
         Toast.fail('失败');
       }
     },

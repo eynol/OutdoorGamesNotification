@@ -4,11 +4,15 @@ import mapToFormData from '../utils/formData';
 import * as ws from './websocket';
 
 
-export default function proxyRequest(url,options){
-    if(ws.isActive()){
-      return Promise.reject(new Error('TODO'))
-    }else{
-      return request(url,{...options,body:mapToFormData(options.body)});
+export default function proxyRequest(url, options = {}) {
+  if (ws.isActive()) {
+    return ws.request(url, options);
+  } else {
+    if (options.body) {
+      return request(url, { ...options, body: mapToFormData(options.body) });
+    } else {
+      return request(url, options);
     }
+  }
 }
 

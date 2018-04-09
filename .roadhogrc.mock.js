@@ -29,6 +29,7 @@ export default {
       autoEnd: true,
       additions: "其他描述",
       joinType: "individual",
+      teams: ['yoooo', 'xxxxx']
     }
   },
   'POST /api/user/signin': (req, res) => {
