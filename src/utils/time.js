@@ -1,8 +1,9 @@
 function toDateSafe(num) {
   let date;
-  if (typeof num === 'number') {
+  const argType = typeof num;
+  if (argType === 'number' || argType === 'string') {
     date = new Date(num);
-  } else if (typeof num === 'object') {
+  } else if (argType === 'object') {
     if (num instanceof Date) {
       date = num;
     };

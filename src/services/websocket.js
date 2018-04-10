@@ -78,6 +78,12 @@ export function request(method, path, data) {
   return new Promise((resolve, reject) => {
     connection.send(sendData);
     callbackPool.set(req_id, { resolve, reject });
+  }).then(data => {
+    if (data.status >= 200 && data.status <= 300) {
+      return data;
+    } else {
+      return Promise.reject(data);
+    }
   });
 }
 

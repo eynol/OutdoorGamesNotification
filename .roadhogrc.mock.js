@@ -8,9 +8,9 @@ export default {
       title: 'Game title here',
       desc: '游戏描述',
       location: "重庆市南岸区崇文路2号珊瑚广场",
-      startTime: 132344343443,
+      beginTime: 132344343443,
       endTime: 13435345345,
-      autoStart: true,
+      autoBegin: true,
       autoEnd: true,
       additions: "其他描述",
       joinType: "individual",
@@ -23,9 +23,9 @@ export default {
       title: 'Game title here',
       desc: '游戏描述',
       location: "重庆市南岸区崇文路2号珊瑚广场",
-      startTime: 132344343443,
+      beginTime: 132344343443,
       endTime: 13435345345,
-      autoStart: true,
+      autoBegin: true,
       autoEnd: true,
       additions: "其他描述",
       joinType: "individual",
@@ -63,9 +63,13 @@ export default {
     }
   },
   'POST /api/user/updatenickname': {
-    nickname: '修改后的昵称'
+    status: 200,
+    result: {
+      nickname: '修改后的昵称'
+    }
   },
   'POST /api/user/updatepassword': {
+    status: 200,
     message: '修改成功！'
   },
 

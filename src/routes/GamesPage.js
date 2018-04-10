@@ -4,6 +4,8 @@ import { Link } from 'dva/router';
 import {
   NavBar,
   List,
+  WingBlank,
+  WhiteSpace,
 } from 'antd-mobile';
 
 
@@ -25,7 +27,7 @@ class GamesPage extends React.Component {
         >所有游戏</NavBar>
 
         <List className="my-list">
-          {list.map((game) => {
+          {list.length ? list.map((game) => {
             return (<Item
               key={game._id}
               arrow="horizontal"
@@ -39,25 +41,9 @@ class GamesPage extends React.Component {
                 <Brief>游戏准备中</Brief>
               </Link>
             </Item>);
-          })}
-          <Item
-            arrow="horizontal"
-            multipleLine
-            onClick={() => { }}
-            platform="android"
-          >
-            多益网络户外游戏Running Man （团队）<Brief>There may have water ripple effect of <br /> material if you set the click event.</Brief>
-            <Brief>重庆市南岸区崇文路2号</Brief>
-            <Brief>游戏准备中</Brief>
-          </Item>
-          <Item
-            arrow="horizontal"
-            multipleLine
-            onClick={() => { }}
-            platform="android"
-          >
-            Title <Brief>subtitle</Brief>
-          </Item>
+          })
+            : (<WingBlank><WhiteSpace/><p>当前暂无游戏，请先创建游戏</p><WhiteSpace/></WingBlank>)
+          }
         </List>
       </div>
     );

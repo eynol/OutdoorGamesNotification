@@ -2,12 +2,18 @@
   "env": {
     "development": {
       "extraBabelPlugins": [
-         ["import", {
-            "libraryName": "antd-mobile",
-            "style": "css"
-          }],
+        ["import", {
+          "libraryName": "antd-mobile",
+          "style": "css"
+        }],
         "dva-hmr"
       ]
+    }
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:3000/",
+      "changeOrigin": true
     }
   }
 }

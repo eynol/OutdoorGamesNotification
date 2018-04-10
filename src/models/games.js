@@ -2,6 +2,8 @@ import request from '../services/request';
 import * as ws from '../services/websocket';
 import pathToRegexp from 'path-to-regexp';
 
+import { routerRedux } from 'dva/router';
+
 import { Toast } from 'antd-mobile';
 
 export default {
@@ -26,7 +28,6 @@ export default {
           dispatch({ type: 'fetch' });
         } else {
           let match = pathToRegexp('/games/detail/:gid').exec(pathname);
-          console.log(match);
           if (match) {
             dispatch({ type: 'fetchDetail', payload: match[1] })
           }
@@ -52,6 +53,27 @@ export default {
         payload: data,
       })
     },
+    *newgame({ payload }, { call, put }) {
+
+      let { data } = yield request('/api/games/newgame', {
+        method: 'post',
+        body: payload
+      });
+
+      yield put({
+        type: 'save',
+        payload: {
+          currentGame: data.result
+        }
+      });
+
+      yield put(routerRedux.replace({
+        pathname: '/gaming'
+      }))
+
+      yield put({ type: 'enterGame' });
+
+    },
     *joinGame({ payload }, { call, put }) {
 
       const { uid, gid, admin, teamorder } = payload;
@@ -64,7 +86,7 @@ export default {
       let resolved = false;
       const { gid, uid } = payload;
 
-      function* requestPermission() {
+      function* _requestPermission() {
         const { data } = yield request('/api/games/assistant', {
           method: 'post',
           body: { gid, uid }
@@ -77,7 +99,7 @@ export default {
         }, time)
       });
       const { permission, timeout } = yield race({
-        permission: call(requestPermission),
+        permission: call(_requestPermission),
         timeout: call(delay, 10000)
       });
       if (permission) {
@@ -93,6 +115,12 @@ export default {
   },
 
   reducers: {
+    enterGame(state, action) {
+      return { ...state, gaming: true };
+    },
+    leaveGame(state, action) {
+      return { ...state, gaming: false };
+    },
     save(state, action) {
       return { ...state, ...action.payload };
     },

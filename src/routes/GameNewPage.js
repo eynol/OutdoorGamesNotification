@@ -12,6 +12,7 @@ import {
   Radio,
   Button,
   WingBlank,
+  Toast,
   WhiteSpace,
 } from 'antd-mobile';
 
@@ -37,16 +38,19 @@ class NewGamePage extends React.Component {
           type: 'games/newgame',
           payload: {
             owner: user._id,
-            ...values, joinType: this.state.joinType,
-            startTime: values.startTime.getTime(),
-            endTime: values.endTime.getTime(),
+            ...values,
+            joinType: this.state.joinType,
           }
         })
-
-        console.log(values);
       } else {
-        console.log(error);
-        alert('Validation failed');
+
+        let messages = Object.keys(error).map((key => {
+          return error[key].errors.map(err => {
+            return err.message;
+          }).join('\n')
+        })).join('\n');
+
+        Toast.fail(<div style={{ whiteSpace: 'pre' }}>{messages}</div>, 2);
       }
     });
   }
@@ -106,8 +110,20 @@ class NewGamePage extends React.Component {
                 clear
                 placeholder="请输入游戏地点"
               >游戏地点</InputItem>
+              <TextareaItem
+                {...getFieldProps('rules', {
+                  rules: [
+                    { required: true, message: '游戏规则不能为空' },
+                    { max: 2000, message: '游戏规则长度不能超过2000个字符' }
+                  ],
+                }) }
+
+                title="游戏规则"
+                autoHeight
+                placeholder="请输入游戏规则"
+              />
               <DatePicker
-                {...getFieldProps('startTime', {
+                {...getFieldProps('beginTime', {
                   initialValue: this.state.dpValue,
                   rules: [
                     { required: true, message: '必须选择一个时间' },
@@ -120,7 +136,7 @@ class NewGamePage extends React.Component {
               ><List.Item arrow="horizontal">开始时间</List.Item></DatePicker>
               <List.Item
                 extra={<Switch
-                  {...getFieldProps('autoStart', {
+                  {...getFieldProps('autoBegin', {
                     initialValue: true,
                     valuePropName: 'checked',
                   }) }

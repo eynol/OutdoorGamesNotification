@@ -3,7 +3,7 @@ import request from '../services/request';
 
 import { Toast } from 'antd-mobile';
 import { routerRedux } from 'dva/router';
-
+import encode from '../utils/encode';
 
 
 export default {
@@ -26,6 +26,8 @@ export default {
     },
     *signin({ payload: values }, { call, put }) {
       try {
+
+        values.password = encode(values.password);
 
         const { data, err } = yield request('/api/user/signin', {
           method: 'post',
@@ -51,6 +53,8 @@ export default {
     *signup({ payload: values }, { call, put }) {
       try {
 
+        values.password = encode(values.password);
+
         const { data, err } = yield request('/api/user/signup', {
           method: 'post',
           body: values
@@ -72,11 +76,12 @@ export default {
         Toast.fail(e.message, 2);
       }
     },
-    *updatenickname({ payload: nickname, resolve, reject }, { call, put }) {
+    *updatenickname({ payload: nickname, resolve, reject }, { call, put, select }) {
       try {
+        const _id = yield select(state => state.user._id);
         const { err } = yield request('/api/user/updatenickname', {
           method: 'post',
-          body: { nickname }
+          body: { _id, nickname }
         })
         if (err) {
           throw err;
@@ -94,11 +99,13 @@ export default {
         reject(0);
       }
     },
-    *updatepassword({ payload: password, resolve, reject }, { call, put }) {
+    *updatepassword({ payload: password, resolve, reject }, { call, put, select }) {
       try {
+        password = encode(password);
+        const _id = yield select(state => state.user._id);
         const { err } = yield request('/api/user/updatepassword', {
           method: 'post',
-          body: { password }
+          body: { _id, password }
         })
         if (err) {
           throw err;

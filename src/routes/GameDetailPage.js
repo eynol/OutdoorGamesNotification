@@ -101,9 +101,12 @@ class GameDetailPage extends React.Component {
             <List renderHeader={'地址'}>
               <Item multipleLine>{currentGame.location}</Item>
             </List>
+            <List renderHeader={'游戏规则'}>
+              <Item multipleLine>{currentGame.rules}</Item>
+            </List>
             <List renderHeader={'游戏时间'}>
               <Item multipleLine>
-                <Badge text={getTimeStr(currentGame.startTime)} />
+                <Badge text={getTimeStr(currentGame.beginTime)} />
                 至
                   <Badge text={getTimeStr(currentGame.endTime)} />
               </Item>
