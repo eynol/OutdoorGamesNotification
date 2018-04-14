@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { Route, Redirect } from 'dva/router';
 import styles from './App.css';
 import AppBar from '../components/AppBar';
+import KeepConnectionAlive from '../components/KeepConnectionAlive';
 
 import GamesPage from './GamesPage';
 import MessagePage from './MessagePage';
@@ -30,6 +31,7 @@ function App({ loading ,ui}) {
         text="Loading..."
         animating={loading}
       />
+      <KeepConnectionAlive/>
       <div className={styles.content}>
         <Route path="/" exact render={() => <Redirect from="/" to="/games" />} />
         <Route path="/games" exact component={GamesPage} />

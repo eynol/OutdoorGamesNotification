@@ -63,9 +63,15 @@ class GameDetailPage extends React.Component {
     }
   }
   requestAssistant = () => {
-    const { user } = this.props;
+    const { user, dispatch, games } = this.props;
     if (user.online) {
-
+      dispatch({
+        type: 'games/requestAssistant',
+        payload: {
+          uid: user._id,
+          gid: games.currentGame._id,
+        }
+      });
     } else {
       Modal.alert('无法申请', '申请管理需要登录账户', [
         { text: '取消' },
