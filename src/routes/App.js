@@ -10,6 +10,7 @@ import MessagePage from './MessagePage';
 import SettingPage from './SettingPage';
 
 import GameNewPage from './GameNewPage';
+import GameEditPage from './GameEditPage';
 import GameDetailPage from './GameDetailPage';
 
 import TeamChoose from './TeamChoose';
@@ -31,7 +32,7 @@ function App({ loading ,ui}) {
         text="Loading..."
         animating={loading}
       />
-      <KeepConnectionAlive/>
+      {/* <KeepConnectionAlive/> */}
       <div className={styles.content}>
         <Route path="/" exact render={() => <Redirect from="/" to="/games" />} />
         <Route path="/games" exact component={GamesPage} />
@@ -40,6 +41,8 @@ function App({ loading ,ui}) {
         <Route path="/messages" exact component={MessagePage} />
         <Route path="/chooseteam" exact component={TeamChoose} />
         <Route path="/gaming" exact component={GamingPage} />
+        <Route path="/gaming/detail" exact component={GameDetailPage} />
+        <Route path="/gaming/edit" exact component={GameEditPage} />
         <Route path="/gaming/team" exact component={TeamManage} />
         <Route path="/setting" exact component={SettingPage} />
         <Route path="/signin" exact component={SignInPage} />

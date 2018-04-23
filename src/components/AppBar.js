@@ -4,9 +4,9 @@ import { TabBar } from 'antd-mobile';
 import { withRouter, routerRedux } from 'dva/router';
 
 
-const GAME_REG = /^\/games/;
+const GAME_REG = /^\/(games)|(gaming)/;
 const MESSAGE_REG = /^\/messages/;
-const SETTING_REG = /^\/setting/;
+const SETTING_REG = /^\/(setting)|(signin)|(signup)/;
 
 class TabBarExample extends React.Component {
   constructor(props) {

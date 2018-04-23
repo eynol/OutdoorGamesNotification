@@ -25,13 +25,22 @@ class TeamChoose extends React.Component {
   }
   submit = () => {
 
+    const { dispatch, games, user } = this.props;
+    const gid = games.currentGame._id;
+    const uid = user._id;
+    const teamid = this.state.team;
+    dispatch({ type: 'games/joinGame', payload: { gid, uid, teamid } });
   }
   refresh = () => {
-
+    const { dispatch, games } = this.props;
+    dispatch({ type: 'games/getJoinList', payload: games.currentGame._id })
   }
   render() {
-    const { dispatch, games } = this.props;
-    const currentGame = games.currentGame;
+    const { games, location } = this.props;
+    const { team, currentGame } = games;
+
+    const { tempUser } = location.state || {};;
+
     if (!currentGame) {
       return (<Redirect replace from="/chooseteam" to="/games" />)
     }
@@ -41,17 +50,17 @@ class TeamChoose extends React.Component {
         >选择游戏团队</NavBar>
         {currentGame && (
           <Fragment>
-            <List renderHeader={'只能选择一个团队'}>
-              {currentGame.teams && currentGame.teams.length ? (
+            <List renderHeader={'请从下方选择一个团队'}>
+              {team && team.length ? (
                 <Fragment>
-                  {currentGame.teams.map(
-                    (team, index) => <RadioItem
-                      key={team}
-                      checked={this.state.team === team}
-                      onChange={() => this.chooseTeam(team)}
-                    >{team}</RadioItem>)}
+                  {team.map(
+                    (joinList, index) => <RadioItem
+                      key={joinList._id}
+                      checked={this.state.team === joinList._id}
+                      onChange={()=>this.chooseTeam(joinList._id)}
+                    >{joinList.team}</RadioItem>)}
                   <WhiteSpace />
-                  <WingBlank><Button type="primary">加入该团队</Button></WingBlank>
+                  <WingBlank><Button type="primary" onClick={this.submit} disabled={!this.state.team}>加入该团队</Button></WingBlank>
                   <WhiteSpace />
                   <WingBlank><Button onClick={this.refresh}>刷新</Button></WingBlank>
                   <WhiteSpace />

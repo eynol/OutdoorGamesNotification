@@ -21,9 +21,14 @@ export function connect(user_id, tempUser) {
   if (connection) {
     return Promise.resolve();
   } else {
+    if (!user_id) {
+      return Promise.reject();
+    }
     return new Promise((resolve, reject) => {
 
-      const ws = new WebSocket('ws://localhost:3000');
+      const host = window.location.hostname+':3000';
+
+      const ws = new WebSocket('ws://'+host);
 
       ws.onopen = function open() {
         connection = ws;
@@ -34,10 +39,10 @@ export function connect(user_id, tempUser) {
       };
 
 
-      ws.onclose = function close() {
+      ws.onclose = function close(code, reason) {
         connection = null;
         clearInterval(heartbeatTimmer);
-        console.log('disconnected');
+        console.log('disconnected', code, reason);
       };
 
 
@@ -58,7 +63,7 @@ export function connect(user_id, tempUser) {
               if (data.status >= 200 && data.status <= 300) {
                 resolveRequest(data.req_id, data.resp);
               } else {
-                rejectRequest(data.req_id, data.resp);
+                resolveRequest(data.req_id, undefined, data.resp);
               }
               break;
             }
@@ -93,6 +98,7 @@ export function connect(user_id, tempUser) {
 
             default: {//default is ping
               for (let action of subscribers.values()) {
+                console.log(action);
                 action(data);
               }
             }
@@ -106,9 +112,9 @@ export function connect(user_id, tempUser) {
 }
 
 
-export function resolveRequest(req_id, data) {
+export function resolveRequest(req_id, data, err) {
   const proxy = callbackPool.get(req_id);
-  proxy.resolve({ data });
+  proxy.resolve({ data, err });
   callbackPool.delete(req_id);
 }
 export function rejectRequest(req_id, err) {
@@ -141,7 +147,7 @@ export function isActive() {
 
 export function listen(action) {
 
-  const subid = new UUID().toString()
+  const subid = UUID.create(4).toString()
   subscribers.set(subid, action);
 
   return unlisten.bind({ id: subid });
@@ -153,7 +159,7 @@ export function unlisten() {
 }
 export function close() {
   if (connection) {
-    connection.close();
+    connection.close(1000, '=');
     connection = null;
   }
 }

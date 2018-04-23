@@ -45,8 +45,6 @@ export default {
         if (err) {
           console.log('err', err)
           throw err;
-        } else if (data.status !== 200) {
-          Toast.fail(data.message, 2);
         } else {
           yield put({
             type: 'save',
@@ -141,6 +139,9 @@ export default {
   reducers: {
     save(state, action) {
       return { ...state, online: true, ...action.payload };
+    },
+    saveTempuser(state, action) {
+      return { ...state, online: false, ...action.payload };
     },
     store(state) {
       LS.set('USER', state);

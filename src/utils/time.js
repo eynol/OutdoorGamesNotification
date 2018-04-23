@@ -36,3 +36,38 @@ export function getTimeStr(num, stringType = 'yyyy年MM月dd日 HH:mm') {
     return 'Timestring parse failed'
   }
 };
+
+export function getTimeGap(begin, end) {
+  try {
+    const $begin = toDateSafe(begin);
+    const $end = toDateSafe(end);
+
+    const $gap = $end.getTime() - $begin.getTime();
+
+    let seconds = Math.round($gap / 1000);
+
+    let minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+
+    let hours = Math.floor(minutes / 60);
+    minutes = minutes % 60;
+
+    let days = Math.floor(hours / 24);
+    hours = hours % 24;
+
+
+    if (days) {
+      return days + '天' + hours + '小时';
+    } else if (hours) {
+      return hours + '小时' + minutes + '分钟';
+    } else if (minutes) {
+      return minutes + '分钟' + seconds + '秒';
+    } else if (seconds) {
+      return seconds + '秒';
+    }
+
+  } catch (e) {
+    console.error(e);
+    return 'Timestring parse failed'
+  }
+}

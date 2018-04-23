@@ -35,16 +35,18 @@ export default {
         } else {
           let match = pathToRegexp('/games/detail/:gid').exec(pathname);
           if (match) {
-            dispatch({ type: 'fetchDetail', payload: match[1] })
+            dispatch({ type: 'fetchDetail', payload: match[1] });
+            dispatch({ type: 'gamingCheck' });
           }
         }
       })
     },
-    websocket({ dispatch }) {
+    websocketSubscriber({ dispatch }) {
+      console.log('websocket subscrib')
       return ws.listen((msg) => {
         switch (msg.type) {
           case 'ASSISTANT_RESP': {
-            dispatch(msg);
+            dispatch({ type: 'ASSISTANT_RESP', result: msg.result });
             break;
           }
           case 'ASSISTANT_REQ': {
@@ -132,13 +134,29 @@ export default {
       }
     },
     *fetchDetail({ payload: gid }, { call, put, }) {
-      let { data } = yield request(`/api/games/detail/${gid}`);
+      let { data, err } = yield request(`/api/games/detail/${gid}`);
+      if (err) {
+        let result;
+        if (err.response) {
+          result = yield err.response.json();
+        } else {
+          result = err;
+        }
 
-      yield put({
-        type: 'save',
-        payload: data,
-      });
-      yield put({ type: 'store' })
+        Toast.fail(result.message);
+        if (result.message === '游戏被删除了或不存在') {
+          yield put({ type: 'gameover' });
+          return 'gameover';
+        }
+      } else {
+
+        yield put({
+          type: 'save',
+          payload: data,
+        });
+        yield put({ type: 'store' });
+        return data;
+      }
     },
     *newgame({ payload }, { call, put }) {
 
@@ -160,13 +178,25 @@ export default {
 
     },
     *getJoinList({ payload: gid }, { call, put }) {
-      const { data, err } = yield request(`/api/joinlists/${gid}`);
-      if (err) {
-        Toast.fail(err.message, 2);
-      } else {
-        yield put({ type: 'save', payload: data });
+
+      try {
+
+        const { data, err } = yield request(`/api/joinlists/${gid}`);
+        if (err) {
+          Toast.fail(err.message, 2);
+        } else {
+          if (data.team.length === 0) {
+            yield put({ type: 'gameover' });
+            Toast.fail('游戏不存在或已被删除');
+          } else {
+            yield put({ type: 'save', payload: data });
+          }
+        }
+        return data;
+      } catch (e) {
+        console.log(e);
+        Toast.fail(e.message, 2);
       }
-      return data;
     },
     *gamingCheck({ payload }, { call, put, select }) {
       const state = yield select(state => state);
@@ -174,7 +204,9 @@ export default {
       const uid = user._id;
       const online = user.online;
       const games = state.games;
-      const currentGame = games.currentGame;
+      let currentGame = games.currentGame;
+
+      console.log('gamecheck');
 
       if (games.gaming) {
         if (!uid) {
@@ -187,22 +219,34 @@ export default {
             //没有当前游戏，退出游戏
             yield put({ type: 'gameover' });
           } else {
+            console.log('gamecheck,current');
+            currentGame = yield yield put({ type: 'fetchDetail', payload: currentGame._id });
+
+            if (currentGame === 'gameover') {
+              return;
+            } else if (!currentGame) {
+              Toast.fail('获取详情失败');
+              return;
+            }
+            currentGame = currentGame.currentGame;
+            // currentGame = yield select(state => state.games.currentGame);
+            console.log('current', currentGame);
             //有当前游戏，检查当前游戏自己的身份
             let isAdmin = currentGame.owner === uid || currentGame.allowedAdmins.includes(uid);
-
+            console.log('isAdmin', isAdmin);
             if (isAdmin) {
               //是管理员
               yield ws.connect(uid);
-              yield put({ type: 'getJoinList', payload: currentGame._id });
+              yield yield put({ type: 'getJoinList', payload: currentGame._id });
             } else {
               //获取参与列表检查是否是参与游戏的玩家
-              const data = yield put({ type: 'getJoinList', payload: currentGame._id });
+              const data = yield yield put({ type: 'getJoinList', payload: currentGame._id });
               const { team = [] } = data;
               const inTeam = team.find(
                 joinlist => joinlist.members.find(
                   member => member._id === uid
                 )
-              )
+              );
 
               if (inTeam) {
                 yield ws.connect(uid);
@@ -217,49 +261,129 @@ export default {
           }
         }
       }
-
-
-
-    },
-    *joinTeamGame({ payload }, { call, put }) {
-
     },
     *joinGame({ payload }, { call, put, select }) {
 
-      const { uid, gid, admin, tempUser, teamid } = payload;
-      if (admin) {
+      const { uid, gid, tempUser, teamid } = payload;
 
-      } else {
-        //玩家加入游戏 需要根据团队类型 是否跳转到选择团队类型；
-        const currentGame = yield select(state => state.games.currentGame);
-        if (currentGame.joinType === 'team') {
+      //玩家加入游戏 需要根据团队类型 是否跳转到选择团队类型；
+      const currentGame = yield select(state => state.games.currentGame);
+
+      if (currentGame.joinType === 'team') {
+
+        if (!teamid) {
           //如果是团队类型的游戏，需要选择团队
           yield put({ type: 'getJoinList', payload: currentGame._id });
-          yield put(routerRedux.goBack());
           yield put({ type: 'enterGame' });
-          yield put(routerRedux.push({ pathname: '/chooseteam' }));
+          yield put(routerRedux.push({ pathname: '/chooseteam' }, { tempUser }));
 
         } else {
-          //如果是个人游戏，那么可以直接加入游戏
-          try {
 
-            yield ws.connect(uid);
-            const { data } = yield request('/api/games/join', {
-              method: 'post',
-              body: { uid, gid, admin, teamid, tempUser }
-            });
+          yield ws.connect(uid, tempUser);
+          const { data, err } = yield request('/api/games/join', {
+            method: 'post',
+            body: { uid, gid, teamid }
+          });
+
+          if (err) {
+            Toast.fail(err.message);
+          } else {
 
             yield put(routerRedux.goBack())
             yield put({ type: 'enterGame' });
             yield put(routerRedux.replace({ pathname: '/gaming' }));
+          }
 
-          } catch (e) {
-            Toast.fail(e.message || e, 2);
+        }
+
+      } else {
+        //如果是个人游戏，那么可以直接加入游戏
+        try {
+
+          yield ws.connect(uid, tempUser);
+          const { data, err } = yield request('/api/games/join', {
+            method: 'post',
+            body: { uid, gid }
+          });
+
+          if (err) {
+            Toast.fail(err.message);
+          } else {
+
+            yield put({ type: 'save', payload: { team: data.team } });
+            yield put({ type: 'store' });
+            yield put(routerRedux.goBack())
+            yield put({ type: 'enterGame' });
+            yield put(routerRedux.replace({ pathname: '/gaming' }));
+          }
+
+        } catch (e) {
+          console.error(e);
+          Toast.fail(e.message || e, 2);
+        }
+      }
+    },
+    *exitGame({ payload }, { call, put, select }) {
+      const state = yield select(state => state);
+      const { user, games } = state;
+      const uid = user._id;
+      const gid = games.currentGame._id;
+
+      let teamid;
+      if (games.currentGame.joinType === 'team') {
+        const theTeam = games.team.find(team => team.members.find(member => member._id === uid));
+        teamid = theTeam._id;
+      } else {
+        teamid = games.team[0]._id;
+      }
+      if (games.gaming) {
+        yield ws.connect(uid);
+        const { data, err } = yield request('/api/games/exit', {
+          method: 'post',
+          body: { uid, gid, teamid }
+        });
+        if (err) {
+          Toast.fail(err.message);
+        } else {
+          if (data.result === 'ok') {
+            Toast.success('退出成功!');
+            yield put({ type: 'gameover' });
+          } else {
+            Toast.fail(data.result);
           }
         }
       }
+    },
+    *updateGame({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/updategame', {
+        method: 'post',
+        body: payload,
+      });
 
+      if (err) {
+        Toast.fail(err.message);
+      } else {
+        Toast.success('保存成功！');
+        yield put(routerRedux.replace({ pathname: '/gaming' }));
+      }
+    },
+    *deleteGame({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/delete', {
+        method: 'post',
+        body: payload,
+      });
 
+      if (err) {
+        Toast.fail(err.message);
+      } else {
+        if (data.result === 'ok') {
+          Toast.success('删除成功!');
+          yield put({ type: 'gameover' });
+          yield put(routerRedux.push({ pathname: '/games' }))
+        } else {
+          Toast.fail(data.result);
+        }
+      }
     },
     *requestAssistant({ payload }, { call, put, race, take }) {
 
@@ -291,6 +415,110 @@ export default {
 
       yield put(routerRedux.push({ pathname: '/games' }));
     },
+    *scoreadd({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/scoreadd', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *scoreminus({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/scoreminus', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *updateteamname({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/updateteamname', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *createTeam({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/createteam', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *deleteteam({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/deleteteam', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *switchTeam({ payload }, { put }) {
+      const { data, err } = yield request('/api/games/switchteam', {
+        method: 'post',
+        body: payload
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      } else {
+        yield put({ type: 'save', payload: data });
+        yield put({ type: 'store' });
+      }
+    },
+    *beginGame(foo, { put, select }) {
+      const { games: { currentGame: { _id: gid } } } = yield select(state => state);
+
+
+      const { data, err } = yield request('/api/games/begin', {
+        method: 'post',
+        body: { gid }
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      }
+    },
+    *endGame(foo, { put, select }) {
+
+      const { games: { currentGame: { _id: gid } } } = yield select(state => state);
+
+      const { data, err } = yield request('/api/games/end', {
+        method: 'post',
+        body: { gid }
+      });
+
+      if (err) {
+        Toast.fail(err.message)
+      }
+    }
   },
 
   reducers: {

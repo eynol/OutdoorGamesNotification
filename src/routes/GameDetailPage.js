@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
+import { routerRedux, Redirect } from 'dva/router';
 import {
   NavBar,
   Badge,
@@ -12,6 +12,9 @@ import {
 } from 'antd-mobile';
 
 import { getTimeStr } from '../utils/time';
+import UUID from 'uuid-js';
+
+
 
 const Item = List.Item;
 const Brief = Item.Brief;
@@ -20,7 +23,13 @@ const Fragment = React.Fragment;
 const JOIN_TYPE = {
   individual: '个人',
   team: '团队'
-}
+};
+
+const STATUS_TYPE = {
+  waiting: '等待中',
+  gaimg: '游戏中',
+  finished: '游戏已经结束',
+};
 
 class GameDetailPage extends React.Component {
 
@@ -34,32 +43,49 @@ class GameDetailPage extends React.Component {
         payload: {
           uid: user._id,
           gid: currentGame._id,
-          admin: 0,
         }
       })
     } else {
-      Modal.alert('未登录', '您未登录账户，但是可以继续输入昵称进行游戏，一旦退出，您的记录将不会保存',
-        [{ text: '取消' }, { text: '我有账号', onPress: () => { dispatch(routerRedux.push({ pathname: '/setting' })) } },
+      // Modal.alert('未登录', '您未登录账户，但是可以继续输入昵称进行游戏，一旦退出，您的记录将不会保存',
+      //   [{ text: '取消' }, { text: '我有账号', onPress: () => { dispatch(routerRedux.push({ pathname: '/setting' })) } },
+      //   {
+      //     text: '创建临时用户', onPress: () => {
+      //       Modal.prompt('输入昵称', '如果游戏中有人使用该昵称将会添加其他字符', [{ text: '取消' }, {
+      //         text: '加入游戏', onPress: (value) => new Promise((res, rej) => {
+      //           if (value.trim()) {
+
+      //             const tempNickname = value + Math.ceil(Math.random() * 10000);
+      //             const uid = UUID.create(4).toString();
+      //             const tempUser = { _id: uid, nickname: tempNickname };
+
+      //             dispatch({
+      //               type: 'user/saveTempuser', payload: { tempUser }
+      //             });
+
+      //             dispatch({
+      //               type: 'games/joinGame',
+      //               payload: {
+      //                 uid: uid,
+      //                 gid: currentGame._id,
+      //                 tempUser,
+      //               }
+      //             });
+      //           } else {
+      //             Toast.fail('昵称不能为空！');
+      //           }
+      //         })
+      //       }])
+      //     }
+      //   }])
+      Modal.alert('未登录', '您未登录账户', [
+        { text: '取消' },
         {
-          text: '创建临时用户', onPress: () => {
-            Modal.prompt('输入昵称', '如果游戏中有人使用该昵称将会添加其他字符', [{ text: '取消' }, {
-              text: '加入游戏', onPress: (value) => new Promise((res, rej) => {
-                if (value.trim()) {
-                  dispatch({
-                    type: 'games/joinGame',
-                    payload: {
-                      uid: user._id,
-                      gid: currentGame._id,
-                      admin: 0,
-                    }
-                  })
-                } else {
-                  Toast.fail('昵称不能为空！');
-                }
-              })
-            }])
+          text: '前往登录',
+          onPress: () => {
+            dispatch(routerRedux.push({ pathname: '/setting' }));
           }
-        }])
+        }
+      ])
     }
   }
   requestAssistant = () => {
@@ -87,19 +113,30 @@ class GameDetailPage extends React.Component {
 
 
   render() {
-    const { dispatch, games } = this.props;
+    const { dispatch, games, user, location, history } = this.props;
     const currentGame = games.currentGame;
+    const gaming = games.gaming;
+    console.log('check history:', history);
+
+    const pathname = location.pathname;
+
+    if (/^\/games/.test(pathname) && gaming) {
+      return <Redirect to='/gaming' />
+    }
 
     return (
       <div>
         <NavBar mode="light"
           icon={<Icon type="left" />}
-          onLeftClick={() => dispatch(routerRedux.go(-1))}
+          onLeftClick={() => dispatch(routerRedux.push({ pathname: '/gaming' }))}
         >详情</NavBar>
         {currentGame && (
           <Fragment>
             <List renderHeader={'标题'}>
               <Item multipleLine>{currentGame.title}</Item>
+            </List>
+            <List renderHeader={'游戏状态'}>
+              <Item multipleLine>{STATUS_TYPE[currentGame.status]}</Item>
             </List>
             <List renderHeader={'描述'}>
               <Item multipleLine>{currentGame.desc}</Item>
@@ -127,16 +164,24 @@ class GameDetailPage extends React.Component {
                 {JOIN_TYPE[currentGame.joinType]}
               </Item>
             </List>
-            <List renderHeader={'操作'}>
-              <Item extra={<Button size="small" type="primary" onClick={this.joinGame}>加入游戏</Button>}>
-                我是玩家
+            {gaming ? null
+              : (
+                <List renderHeader={'操作'}>
+                  <Item extra={<Button size="small"
+                    type="primary"
+                    disabled={currentGame.status === 'finished'}
+                    onClick={this.joinGame}>加入游戏</Button>}>
+                    我是玩家
                   <Brief>将作为玩家参与到游戏中</Brief>
-              </Item>
-              <Item extra={<Button size="small" type="primary" onClick={this.requestAssistant}>申请管理</Button>}>
-                我是工作人员
+                  </Item>
+                  <Item extra={<Button size="small" type="primary"
+                    disabled={currentGame.status === 'finished'}
+                    onClick={this.requestAssistant}>申请管理</Button>}>
+                    我是工作人员
                   <Brief>将作为工作人员协助游戏管理</Brief>
-              </Item>
-            </List>
+                  </Item>
+                </List>
+              )}
           </Fragment>)
         }
       </div>

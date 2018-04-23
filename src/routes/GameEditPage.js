@@ -14,6 +14,7 @@ import {
   WingBlank,
   Toast,
   WhiteSpace,
+  Modal,
 } from 'antd-mobile';
 
 import { createForm } from 'rc-form';
@@ -23,18 +24,31 @@ import styles from './GameNewPage.css';
 const RadioItem = Radio.RadioItem;
 const Fragment = React.Fragment;
 const JOIN_TYPE = [{ text: '个人参赛', value: 'individual' }, { text: '团队参赛', value: 'team' }]
-let foo;
+
 class NewGamePage extends React.Component {
   state = {
-    dpValue: (foo = new Date(), foo.setMinutes(0), foo.setSeconds(0), foo),
-    joinType: 'individual',
+    dpValue: new Date(),
+    joinType: null,
   }
+  deleteGame = () => {
+    const { dispatch, games, user } = this.props;
+    const { currentGame } = games;
+    const gid = currentGame._id;
+    const uid = user._id;
 
+    Modal.alert('确定删除游戏？', '', [
+      { text: '取消' },
+      {
+        text: '确定', onPress: () => {
+          dispatch({ type: 'games/deleteGame', payload: { gid, uid } });
+        }
+      },
+    ])
+  }
   submit = () => {
-    const { dispatch, form, user } = this.props;
+    const { dispatch, form, user, games } = this.props;
     form.validateFields((error, values) => {
       if (!error) {
-
         //检查时间
         const now = new Date();
 
@@ -56,16 +70,41 @@ class NewGamePage extends React.Component {
           Toast.fail('游戏总时长不能超过30天');
         } else {
 
-          dispatch({
-            type: 'games/newgame',
-            payload: {
-              owner: user._id,
-              ...values,
-              joinType: this.state.joinType,
-            }
-          })
-        }
+          //diff todo;
+          const { currentGame } = games;
 
+          const data = {};
+          for (var key in values) {
+            if (values[key] !== currentGame[key]) {
+              if (['beginTime', 'endTime'].includes(key)) {
+                const oldValue = new Date(currentGame[key]);
+                if (values[key].getTime() !== oldValue.getTime()) {
+                  data[key] = values[key];
+                }
+              } else {
+                data[key] = values[key];
+              }
+            }
+          }
+
+          if (Object.keys(data).length) {
+            console.log('changed', data);
+            dispatch({
+              type: 'games/updateGame',
+              payload: {
+                uid: user._id,
+                gid: currentGame._id,
+                ...data,
+              }
+            })
+          } else {
+            //没有任何改变
+            dispatch(routerRedux.go(-1));
+          }
+
+
+
+        }
       } else {
 
         let messages = Object.keys(error).map((key => {
@@ -91,19 +130,21 @@ class NewGamePage extends React.Component {
   }
 
   render() {
-    const { dispatch, form, user } = this.props;
+    const { dispatch, form, user, games } = this.props;
     const { getFieldProps } = form;
+    const { currentGame } = games;
     return (
       <div>
         <NavBar mode="light"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.go(-1))}
-        >新建游戏</NavBar>
+        >修改信息</NavBar>
         {user.online ? (
           <Fragment>
             <List className={styles.datemore}>
               <InputItem
                 {...getFieldProps('title', {
+                  initialValue: currentGame.title,
                   rules: [
                     { required: true, message: '标题不能为空' },
                     { max: 120, message: '游戏标题长度不能超过120个字符' }
@@ -114,6 +155,7 @@ class NewGamePage extends React.Component {
               >游戏标题</InputItem>
               <TextareaItem
                 {...getFieldProps('desc', {
+                  initialValue: currentGame.desc,
                   rules: [
                     { required: true, message: '游戏描述不能为空' },
                     { max: 500, message: '游戏描述长度不能超过500个字符' }
@@ -126,6 +168,7 @@ class NewGamePage extends React.Component {
               />
               <InputItem
                 {...getFieldProps('location', {
+                  initialValue: currentGame.location,
                   rules: [
                     { required: true, message: '游戏地点不能为空' },
                     { max: 50, message: '游戏地点长度不能超过50个字符' }
@@ -136,6 +179,7 @@ class NewGamePage extends React.Component {
               >游戏地点</InputItem>
               <TextareaItem
                 {...getFieldProps('rules', {
+                  initialValue: currentGame.rules,
                   rules: [
                     { required: true, message: '游戏规则不能为空' },
                     { max: 2000, message: '游戏规则长度不能超过2000个字符' }
@@ -147,8 +191,9 @@ class NewGamePage extends React.Component {
                 placeholder="请输入游戏规则"
               />
               <DatePicker
+                disabled={currentGame.status !== 'waiting'}
                 {...getFieldProps('beginTime', {
-                  initialValue: this.state.dpValue,
+                  initialValue: new Date(currentGame.beginTime),
                   rules: [
                     { required: true, message: '必须选择一个时间' },
                     { validator: this.validateDatePicker },
@@ -160,15 +205,17 @@ class NewGamePage extends React.Component {
               ><List.Item arrow="horizontal">开始时间</List.Item></DatePicker>
               <List.Item
                 extra={<Switch
+                  disabled={currentGame.status !== 'waiting'}
                   {...getFieldProps('autoBegin', {
-                    initialValue: true,
+                    initialValue: currentGame.autoBegin,
                     valuePropName: 'checked',
                   }) }
                 />}
               >自动开始</List.Item>
               <DatePicker
+                disabled={currentGame.status !== 'waiting'}
                 {...getFieldProps('endTime', {
-                  initialValue: this.state.dpValue,
+                  initialValue: new Date(currentGame.endTime),
                   rules: [
                     { required: true, message: '必须选择一个时间' },
                     { validator: this.validateDatePicker },
@@ -179,15 +226,17 @@ class NewGamePage extends React.Component {
                 mode="datetime"
               ><List.Item arrow="horizontal">结束时间</List.Item></DatePicker>
               <List.Item
+
                 extra={<Switch
                   {...getFieldProps('autoEnd', {
-                    initialValue: true,
+                    initialValue: currentGame.autoEnd,
                     valuePropName: 'checked',
                   }) }
                 />}
               >自动结束</List.Item>
               <TextareaItem
                 {...getFieldProps('additions', {
+                  initialValue: currentGame.additions,
                   rules: [
                     { required: true, message: '备注不能为空' },
                     { max: 500, message: '备注长度不能超过500个字符' }
@@ -199,12 +248,11 @@ class NewGamePage extends React.Component {
                 placeholder="请输入备注"
               />
             </List>
-            <List renderHeader={() => '参赛类型'}>
+            <List renderHeader={() => '参赛类型(不可更改)'}>
               {JOIN_TYPE.map(i => (
                 <RadioItem
                   key={i.value}
-                  checked={this.state.joinType === i.value}
-                  onChange={() => this.ChangeJoinType(i.value)}>
+                  checked={currentGame.joinType === i.value}>
                   {i.text}
                 </RadioItem>
               ))}
@@ -212,8 +260,12 @@ class NewGamePage extends React.Component {
             <WhiteSpace />
             <WhiteSpace />
             <List>
-              <WingBlank><Button type="primary"
-                onClick={this.submit}>立即创建游戏</Button></WingBlank>
+              <List.Item>
+                <Button type="primary" onClick={this.submit}>保存</Button>
+              </List.Item>
+              <List.Item>
+                <Button type="warning" onClick={this.deleteGame}>删除游戏</Button>
+              </List.Item>
             </List>
             <WhiteSpace />
             <WhiteSpace />
@@ -234,7 +286,7 @@ NewGamePage.propTypes = {
 };
 
 function mapStateToProps(state) {
-  return { user: state.user };
+  return { user: state.user, games: state.games };
 }
 
 const NewGameFormWrapper = createForm()(NewGamePage);

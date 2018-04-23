@@ -17,14 +17,14 @@ class KeepAlive extends React.Component {
     let connecting = false;
     const timmer = setInterval(() => {
       const { unmounted } = this.state;
-      const { games, user } = this.props;
+      const { games, user, dispatch } = this.props;
 
       if (unmounted) { clearTimeout(timmer); return }
 
       if (games.gaming) {
         if (!ws.isActive()) {
           if (connecting) {
-            Toast.fail(`WebSocket连接中断,尝试重新连接`, 500);
+            Toast.fail(`WebSocket连接中断,尝试重新连接中`, 500);
           } else {
             connecting = true;
             Toast.fail('WebSocket连接中断,尝试重新连接', 500);
