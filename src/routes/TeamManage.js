@@ -77,31 +77,34 @@ class TeamChoose extends React.Component {
       return (<Redirect replace from="/chooseteam" to="/games" />)
     }
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
         >团队管理</NavBar>
-        {currentGame && (
-          <Fragment>
-            <List>
-              {currentGame.teams && currentGame.teams.length ? (
-                <Fragment>
-                  {currentGame.teams.map(
-                    (team, index) => <Item
-                      key={team}
-                      arrow="horizontal"
-                      multipleLine
-                      onClick={this.showMenu.bind(team)}
-                      platform="android"
-                    >{team}<Brief>团队成员人数：<Badge>3</Badge></Brief>
-                    </Item>)}
+        <div className="content">
+          {currentGame && (
+            <Fragment>
+              <List>
+                {currentGame.teams && currentGame.teams.length ? (
+                  <Fragment>
+                    {currentGame.teams.map(
+                      (team, index) => <Item
+                        key={team}
+                        arrow="horizontal"
+                        multipleLine
+                        onClick={this.showMenu.bind(team)}
+                        platform="android"
+                      >{team}<Brief>团队成员人数：<Badge>3</Badge></Brief>
+                      </Item>)}
 
-                </Fragment>
-              ) : (
-                  <Button onClick={this.refresh}>刷新</Button>
-                )}
-            </List>
-          </Fragment>)
-        }
+                  </Fragment>
+                ) : (
+                    <Button onClick={this.refresh}>刷新</Button>
+                  )}
+              </List>
+            </Fragment>)
+          }
+        </div>
       </div>
     );
   }

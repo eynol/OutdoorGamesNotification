@@ -64,6 +64,8 @@ export default {
               Modal.alert('连接超时', '可能的原因：网络阻塞或服务器阻塞，导致心跳检测失败',
                 [{ text: '刷新页面', onPress: () => window.location.reload() },
                 { text: '尝试重新连接', onPress: () => dispatch({ type: 'reconnect' }) }]);
+            } else if (reason === 'gameover') {
+              Toast.fail('游戏已断开');
             } else {
 
               Modal.alert('连接异常中断', <div>退出代码:{code}<br />reason:{reason}<br /></div>,

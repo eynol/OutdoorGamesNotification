@@ -43,39 +43,42 @@ class SignInForm extends React.Component {
     const { dispatch } = this.props;
     const { getFieldProps } = this.props.form;
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.go(-1))}
         >登录</NavBar>
-        <List>
-          <InputItem
-            {...getFieldProps('username', {
-              rules: [
-                { required: true, message: '用户名不能为空' },
-                { max: 23, message: '用户名长度不能超过23位' }
-              ],
-            }) }
-            clear
-            placeholder="请输入您的用户名"
-            ref={el => this.username = el}
-          >用户名</InputItem>
-          <InputItem
-            {...getFieldProps('password', {
-              rules: [
-                { required: true, message: '密码不能为空' },
-                { max: 23, message: '用户名长度不能超过23位' }
-              ],
-            }) }
-            type="password"
-            clear
-            placeholder="请输入密码"
-          >密码</InputItem>
-        </List>
-        <WhiteSpace />
-        <WingBlank>
-          <Button type="primary" onClick={this.submit}>立即登录</Button>
-        </WingBlank>
+        <div className="content">
+          <List>
+            <InputItem
+              {...getFieldProps('username', {
+                rules: [
+                  { required: true, message: '用户名不能为空' },
+                  { max: 23, message: '用户名长度不能超过23位' }
+                ],
+              }) }
+              clear
+              placeholder="请输入您的用户名"
+              ref={el => this.username = el}
+            >用户名</InputItem>
+            <InputItem
+              {...getFieldProps('password', {
+                rules: [
+                  { required: true, message: '密码不能为空' },
+                  { max: 23, message: '用户名长度不能超过23位' }
+                ],
+              }) }
+              type="password"
+              clear
+              placeholder="请输入密码"
+            >密码</InputItem>
+          </List>
+          <WhiteSpace />
+          <WingBlank>
+            <Button type="primary" onClick={this.submit}>立即登录</Button>
+          </WingBlank>
+        </div>
       </div>
     );
   }

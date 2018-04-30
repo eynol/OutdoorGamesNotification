@@ -1,16 +1,41 @@
-
-.frame {
+:global .app-frame {
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
 }
 
-.content {
+:global .frame {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+:global .frame :global .am-notice-bar {
+    flex-shrink: 0;
+}
+
+:global .content {
     flex-grow: 1;
     overflow: auto;
 }
 
-.appbar {
+:global .app-content {
+    flex-grow: 1;
+    position: relative;
+    flex-basis: 50%;
+    display: inline-flex;
+    width: 100%;
+    overflow: auto;
+}
+
+:global .appbar {
     flex-basis: 50px;
+}
+
+:global .o-navbar {
+    flex-basis: 45px;
+    flex-shrink: 0;
+    flex-grow: 0;
 }

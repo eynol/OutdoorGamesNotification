@@ -27,14 +27,14 @@ import { ActivityIndicator } from 'antd-mobile';
 
 function App({ loading, ui }) {
   return (
-    <div className={styles.frame}>
+    <div className={'app-frame'}>
       <ActivityIndicator
         toast
         text="Loading..."
         animating={loading}
       />
       {/* <KeepConnectionAlive/> */}
-      <div className={styles.content}>
+      <div className={'app-content'}>
         <Route path="/" exact render={() => <Redirect from="/" to="/games" />} />
         <Route path="/games" exact component={GamesPage} />
         <Route path="/games/new" exact component={GameNewPage} />
@@ -51,7 +51,7 @@ function App({ loading, ui }) {
         <Route path="/signup" exact component={SignUpPage} />
       </div>
       {ui.appbar ? (
-        <div className={styles.appbar}>
+        <div className={'appbar'}>
           <AppBar />
         </div>)
         : null}

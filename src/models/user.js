@@ -133,6 +133,7 @@ export default {
       // request websocket.
       yield put({ type: 'exit' });
       yield put({ type: 'store' });
+      yield put({ type: 'games/gameover' });
     },
   },
 

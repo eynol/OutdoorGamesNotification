@@ -94,137 +94,139 @@ class NewGamePage extends React.Component {
     const { dispatch, form, user } = this.props;
     const { getFieldProps } = form;
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.go(-1))}
         >新建游戏</NavBar>
-        {user.online ? (
-          <Fragment>
-            <List className={styles.datemore}>
-              <InputItem
-                {...getFieldProps('title', {
-                  rules: [
-                    { required: true, message: '标题不能为空' },
-                    { max: 120, message: '游戏标题长度不能超过120个字符' }
-                  ],
-                }) }
-                clear
-                placeholder="请输入游戏标题"
-              >游戏标题</InputItem>
-              <TextareaItem
-                {...getFieldProps('desc', {
-                  rules: [
-                    { required: true, message: '游戏描述不能为空' },
-                    { max: 500, message: '游戏描述长度不能超过500个字符' }
-                  ],
-                }) }
-                rows="3"
-                title="游戏描述"
-                autoHeight
-                placeholder="请输入游戏描述"
-              />
-              <InputItem
-                {...getFieldProps('location', {
-                  rules: [
-                    { required: true, message: '游戏地点不能为空' },
-                    { max: 50, message: '游戏地点长度不能超过50个字符' }
-                  ],
-                }) }
-                clear
-                placeholder="请输入游戏地点"
-              >游戏地点</InputItem>
-              <TextareaItem
-                {...getFieldProps('rules', {
-                  rules: [
-                    { required: true, message: '游戏规则不能为空' },
-                    { max: 2000, message: '游戏规则长度不能超过2000个字符' }
-                  ],
-                }) }
-                rows="3"
-                title="游戏规则"
-                autoHeight
-                placeholder="请输入游戏规则"
-              />
-              <DatePicker
-                {...getFieldProps('beginTime', {
-                  initialValue: this.state.dpValue,
-                  rules: [
-                    { required: true, message: '必须选择一个时间' },
-                    { validator: this.validateDatePicker },
-                  ],
-                }) }
-                title="开始时间"
-                extra="请选择"
-                mode="datetime"
-              ><List.Item arrow="horizontal">开始时间</List.Item></DatePicker>
-              <List.Item
-                extra={<Switch
-                  {...getFieldProps('autoBegin', {
-                    initialValue: true,
-                    valuePropName: 'checked',
+        <div className="content">
+          {user.online ? (
+            <Fragment>
+              <List className={styles.datemore}>
+                <InputItem
+                  {...getFieldProps('title', {
+                    rules: [
+                      { required: true, message: '标题不能为空' },
+                      { max: 120, message: '游戏标题长度不能超过120个字符' }
+                    ],
                   }) }
-                />}
-              >自动开始</List.Item>
-              <DatePicker
-                {...getFieldProps('endTime', {
-                  initialValue: this.state.dpValue,
-                  rules: [
-                    { required: true, message: '必须选择一个时间' },
-                    { validator: this.validateDatePicker },
-                  ],
-                }) }
-                title="结束时间"
-                extra="请选择"
-                mode="datetime"
-              ><List.Item arrow="horizontal">结束时间</List.Item></DatePicker>
-              <List.Item
-                extra={<Switch
-                  {...getFieldProps('autoEnd', {
-                    initialValue: true,
-                    valuePropName: 'checked',
+                  clear
+                  placeholder="请输入游戏标题"
+                >游戏标题</InputItem>
+                <TextareaItem
+                  {...getFieldProps('desc', {
+                    rules: [
+                      { required: true, message: '游戏描述不能为空' },
+                      { max: 500, message: '游戏描述长度不能超过500个字符' }
+                    ],
                   }) }
-                />}
-              >自动结束</List.Item>
-              <TextareaItem
-                {...getFieldProps('additions', {
-                  rules: [
-                    { required: true, message: '备注不能为空' },
-                    { max: 500, message: '备注长度不能超过500个字符' }
-                  ],
-                }) }
-                rows="3"
-                title="备注"
-                autoHeight
-                placeholder="请输入备注"
-              />
-            </List>
-            <List renderHeader={() => '参赛类型'}>
-              {JOIN_TYPE.map(i => (
-                <RadioItem
-                  key={i.value}
-                  checked={this.state.joinType === i.value}
-                  onChange={() => this.ChangeJoinType(i.value)}>
-                  {i.text}
-                </RadioItem>
-              ))}
-            </List>
-            <WhiteSpace />
-            <WhiteSpace />
-            <List>
-              <WingBlank><Button type="primary"
-                onClick={this.submit}>立即创建游戏</Button></WingBlank>
-            </List>
-            <WhiteSpace />
-            <WhiteSpace />
-          </Fragment>)
-          : (
-            <Fragment key="needSignin">
-              <WingBlank><p>创建游戏需要登录账户，请先登录</p></WingBlank>
-              <WingBlank><Link to="/setting"><Button>前往登录</Button></Link></WingBlank>
-            </Fragment>
-          )}
-
+                  rows="3"
+                  title="游戏描述"
+                  autoHeight
+                  placeholder="请输入游戏描述"
+                />
+                <InputItem
+                  {...getFieldProps('location', {
+                    rules: [
+                      { required: true, message: '游戏地点不能为空' },
+                      { max: 50, message: '游戏地点长度不能超过50个字符' }
+                    ],
+                  }) }
+                  clear
+                  placeholder="请输入游戏地点"
+                >游戏地点</InputItem>
+                <TextareaItem
+                  {...getFieldProps('rules', {
+                    rules: [
+                      { required: true, message: '游戏规则不能为空' },
+                      { max: 2000, message: '游戏规则长度不能超过2000个字符' }
+                    ],
+                  }) }
+                  rows="3"
+                  title="游戏规则"
+                  autoHeight
+                  placeholder="请输入游戏规则"
+                />
+                <DatePicker
+                  {...getFieldProps('beginTime', {
+                    initialValue: this.state.dpValue,
+                    rules: [
+                      { required: true, message: '必须选择一个时间' },
+                      { validator: this.validateDatePicker },
+                    ],
+                  }) }
+                  title="开始时间"
+                  extra="请选择"
+                  mode="datetime"
+                ><List.Item arrow="horizontal">开始时间</List.Item></DatePicker>
+                <List.Item
+                  extra={<Switch
+                    {...getFieldProps('autoBegin', {
+                      initialValue: true,
+                      valuePropName: 'checked',
+                    }) }
+                  />}
+                >自动开始</List.Item>
+                <DatePicker
+                  {...getFieldProps('endTime', {
+                    initialValue: this.state.dpValue,
+                    rules: [
+                      { required: true, message: '必须选择一个时间' },
+                      { validator: this.validateDatePicker },
+                    ],
+                  }) }
+                  title="结束时间"
+                  extra="请选择"
+                  mode="datetime"
+                ><List.Item arrow="horizontal">结束时间</List.Item></DatePicker>
+                <List.Item
+                  extra={<Switch
+                    {...getFieldProps('autoEnd', {
+                      initialValue: true,
+                      valuePropName: 'checked',
+                    }) }
+                  />}
+                >自动结束</List.Item>
+                <TextareaItem
+                  {...getFieldProps('additions', {
+                    rules: [
+                      { required: true, message: '备注不能为空' },
+                      { max: 500, message: '备注长度不能超过500个字符' }
+                    ],
+                  }) }
+                  rows="3"
+                  title="备注"
+                  autoHeight
+                  placeholder="请输入备注"
+                />
+              </List>
+              <List renderHeader={() => '参赛类型'}>
+                {JOIN_TYPE.map(i => (
+                  <RadioItem
+                    key={i.value}
+                    checked={this.state.joinType === i.value}
+                    onChange={() => this.ChangeJoinType(i.value)}>
+                    {i.text}
+                  </RadioItem>
+                ))}
+              </List>
+              <WhiteSpace />
+              <WhiteSpace />
+              <List>
+                <WingBlank><Button type="primary"
+                  onClick={this.submit}>立即创建游戏</Button></WingBlank>
+              </List>
+              <WhiteSpace />
+              <WhiteSpace />
+            </Fragment>)
+            : (
+              <Fragment key="needSignin">
+                <WingBlank><p>创建游戏需要登录账户，请先登录</p></WingBlank>
+                <WingBlank><Link to="/setting"><Button>前往登录</Button></Link></WingBlank>
+              </Fragment>
+            )}
+        </div>
       </div>
     );
   }

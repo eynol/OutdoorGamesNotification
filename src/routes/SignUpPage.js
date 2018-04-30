@@ -46,61 +46,64 @@ class SignUpForm extends React.Component {
     const { dispatch } = this.props;
     const { getFieldProps } = this.props.form;
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.go(-1))}
         >注册</NavBar>
-        <List>
-          <InputItem
-            {...getFieldProps('nickname', {
-              rules: [
-                { required: true, message: '昵称不能为空' },
-                { max: 10, message: '昵称长度不能超过23位' }
-              ],
-            }) }
-            clear
-            placeholder="请输入您的昵称"
-            ref={el => this.username = el}
-          >昵称</InputItem>
-          <InputItem
-            {...getFieldProps('username', {
-              rules: [
-                { required: true, message: '用户名不能为空' },
-                { max: 23, message: '用户名长度不能超过23位' }
-              ],
-            }) }
-            clear
-            placeholder="请输入您的用户名"
-            ref={el => this.username = el}
-          >用户名</InputItem>
-          <InputItem
-            {...getFieldProps('password', {
-              rules: [
-                { required: true, message: '密码不能为空' },
-                { max: 23, message: '密码长度不能超过23位' }
-              ],
-            }) }
-            type="password"
-            clear
-            placeholder="请输入密码"
-          >密码</InputItem>
-          <InputItem
-            {...getFieldProps('password2', {
-              rules: [
-                { required: true, message: '密码不能为空' },
-                { max: 23, message: '密码长度不能超过23位' }
-              ],
-            }) }
-            type="password"
-            clear
-            placeholder="请二次确认您的密码"
-          >请确认密码</InputItem>
-        </List>
-        <WhiteSpace />
-        <WingBlank>
-          <Button type="primary" onClick={this.submit}>立即注册</Button>
-        </WingBlank>
+        <div className="content">
+          <List>
+            <InputItem
+              {...getFieldProps('nickname', {
+                rules: [
+                  { required: true, message: '昵称不能为空' },
+                  { max: 10, message: '昵称长度不能超过23位' }
+                ],
+              }) }
+              clear
+              placeholder="请输入您的昵称"
+              ref={el => this.username = el}
+            >昵称</InputItem>
+            <InputItem
+              {...getFieldProps('username', {
+                rules: [
+                  { required: true, message: '用户名不能为空' },
+                  { max: 23, message: '用户名长度不能超过23位' }
+                ],
+              }) }
+              clear
+              placeholder="请输入您的用户名"
+              ref={el => this.username = el}
+            >用户名</InputItem>
+            <InputItem
+              {...getFieldProps('password', {
+                rules: [
+                  { required: true, message: '密码不能为空' },
+                  { max: 23, message: '密码长度不能超过23位' }
+                ],
+              }) }
+              type="password"
+              clear
+              placeholder="请输入密码"
+            >密码</InputItem>
+            <InputItem
+              {...getFieldProps('password2', {
+                rules: [
+                  { required: true, message: '密码不能为空' },
+                  { max: 23, message: '密码长度不能超过23位' }
+                ],
+              }) }
+              type="password"
+              clear
+              placeholder="请二次确认您的密码"
+            >请确认密码</InputItem>
+          </List>
+          <WhiteSpace />
+          <WingBlank>
+            <Button type="primary" onClick={this.submit}>立即注册</Button>
+          </WingBlank>
+        </div>
       </div>
     );
   }

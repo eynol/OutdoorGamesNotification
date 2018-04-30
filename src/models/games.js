@@ -278,9 +278,18 @@ export default {
 
         if (!teamid) {
           //如果是团队类型的游戏，需要选择团队
-          yield put({ type: 'getJoinList', payload: currentGame._id });
-          yield put({ type: 'enterGame' });
-          yield put(routerRedux.push({ pathname: '/chooseteam' }, { tempUser }));
+          const data = yield yield put({ type: 'getJoinList', payload: currentGame._id });
+
+          const inTeam = data.team.find(team => team.members.find(m => m._id === uid));
+          if (inTeam) {
+            yield put({ type: 'enterGame' });
+            yield put(routerRedux.replace('/gaming'));
+          } else {
+
+            yield put({ type: 'enterGame' });
+            yield put(routerRedux.push({ pathname: '/chooseteam' }, { tempUser }));
+          }
+
 
         } else {
 

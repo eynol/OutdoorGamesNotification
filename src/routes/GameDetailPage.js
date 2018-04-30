@@ -125,65 +125,68 @@ class GameDetailPage extends React.Component {
     }
 
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.push({ pathname: '/gaming' }))}
         >详情</NavBar>
-        {currentGame && (
-          <Fragment>
-            <List renderHeader={'标题'}>
-              <Item multipleLine>{currentGame.title}</Item>
-            </List>
-            <List renderHeader={'游戏状态'}>
-              <Item multipleLine>{STATUS_TYPE[currentGame.status]}</Item>
-            </List>
-            <List renderHeader={'描述'}>
-              <Item multipleLine>{currentGame.desc}</Item>
-            </List>
-            <List renderHeader={'地址'}>
-              <Item multipleLine>{currentGame.location}</Item>
-            </List>
-            <List renderHeader={'游戏规则'}>
-              <Item multipleLine>{currentGame.rules}</Item>
-            </List>
-            <List renderHeader={'游戏时间'}>
-              <Item multipleLine>
-                <Badge text={getTimeStr(currentGame.beginTime)} />
-                至
+        <div className="content">
+          {currentGame && (
+            <Fragment>
+              <List renderHeader={'标题'}>
+                <Item multipleLine>{currentGame.title}</Item>
+              </List>
+              <List renderHeader={'游戏状态'}>
+                <Item multipleLine>{STATUS_TYPE[currentGame.status]}</Item>
+              </List>
+              <List renderHeader={'描述'}>
+                <Item multipleLine>{currentGame.desc}</Item>
+              </List>
+              <List renderHeader={'地址'}>
+                <Item multipleLine>{currentGame.location}</Item>
+              </List>
+              <List renderHeader={'游戏规则'}>
+                <Item multipleLine>{currentGame.rules}</Item>
+              </List>
+              <List renderHeader={'游戏时间'}>
+                <Item multipleLine>
+                  <Badge text={getTimeStr(currentGame.beginTime)} />
+                  至
                   <Badge text={getTimeStr(currentGame.endTime)} />
-              </Item>
-            </List>
-            <List renderHeader={'备注'}>
-              <Item multipleLine>
-                <p>{currentGame.additions}</p>
-              </Item>
-            </List>
-            <List renderHeader={'游戏类型'}>
-              <Item multipleLine>
-                {JOIN_TYPE[currentGame.joinType]}
-              </Item>
-            </List>
-            {gaming ? null
-              : (
-                <List renderHeader={'操作'}>
-                  <Item extra={<Button size="small"
-                    type="primary"
-                    disabled={currentGame.status === 'finished'}
-                    onClick={this.joinGame}>加入游戏</Button>}>
-                    我是玩家
+                </Item>
+              </List>
+              <List renderHeader={'备注'}>
+                <Item multipleLine>
+                  <p>{currentGame.additions}</p>
+                </Item>
+              </List>
+              <List renderHeader={'游戏类型'}>
+                <Item multipleLine>
+                  {JOIN_TYPE[currentGame.joinType]}
+                </Item>
+              </List>
+              {gaming ? null
+                : (
+                  <List renderHeader={'操作'}>
+                    <Item extra={<Button size="small"
+                      type="primary"
+                      disabled={currentGame.status === 'finished'}
+                      onClick={this.joinGame}>加入游戏</Button>}>
+                      我是玩家
                   <Brief>将作为玩家参与到游戏中</Brief>
-                  </Item>
-                  <Item extra={<Button size="small" type="primary"
-                    disabled={currentGame.status === 'finished'}
-                    onClick={this.requestAssistant}>申请管理</Button>}>
-                    我是工作人员
+                    </Item>
+                    <Item extra={<Button size="small" type="primary"
+                      disabled={currentGame.status === 'finished'}
+                      onClick={this.requestAssistant}>申请管理</Button>}>
+                      我是工作人员
                   <Brief>将作为工作人员协助游戏管理</Brief>
-                  </Item>
-                </List>
-              )}
-          </Fragment>)
-        }
+                    </Item>
+                  </List>
+                )}
+            </Fragment>)
+          }
+        </div>
       </div>
     );
   }

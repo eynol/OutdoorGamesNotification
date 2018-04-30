@@ -285,8 +285,9 @@ class GameDetailPage extends React.Component {
     const noticeProps = { beginDate, autoBegin, autoEnd, endDate, status };
 
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           rightContent={[
             isOwner ? <Link to="/gaming/edit" key="1" className="iconfont icon-edit" style={{ width: 22, marginLeft: 5 }} /> : null,
             <Link to="/gaming/detail" key="0" className="iconfont icon-info" style={{ width: 22, marginLeft: 5 }} />,
@@ -297,70 +298,72 @@ class GameDetailPage extends React.Component {
         <NoticeBar marqueeProps={{ loop: true, style: { padding: '0 7.5px' } }}>
           <MyGameNoticeBar {...noticeProps} />
         </NoticeBar>
-        <List renderHeader="">
-          <Item>
-            {currentGame.title}<Brief>{currentGame.desc}</Brief>
-          </Item>
-        </List>
-        <List renderHeader={'地址'}>
-          <Item multipleLine>{currentGame.location}</Item>
-        </List>
-        <List renderHeader={'游戏时间'}>
-          <Item multipleLine>
-            <Badge text={getTimeStr(currentGame.beginTime)} />
-            至
+        <div className="content">
+          <List renderHeader="">
+            <Item>
+              {currentGame.title}<Brief>{currentGame.desc}</Brief>
+            </Item>
+          </List>
+          <List renderHeader={'地址'}>
+            <Item multipleLine>{currentGame.location}</Item>
+          </List>
+          <List renderHeader={'游戏时间'}>
+            <Item multipleLine>
+              <Badge text={getTimeStr(currentGame.beginTime)} />
+              至
             <Badge text={getTimeStr(currentGame.endTime)} />
-            <Brief>游戏总时长约为{totalMinutes}分钟</Brief>
-          </Item>
-        </List>
-        <List renderHeader={'得分榜'}>
-          {isTeam ? (
-            team.slice().sort((a, b) => b.score - a.score).map(
-              v => <Item
-                key={v._id}
-                arrow="horizontal"
-                platform="android"
-                onClick={() => this.showScoreAction(isTeam, isAdmin, v._id, v.team)}>
-                <Badge overflowCount={OVERFLOW_COUNT} text={v.teamScore || '0'} />
-                {v.team}({v.members.length}人){isPlayer && v._id === isPlayer._id ? '(当前队伍)' : null}
-
-              </Item>)
-          ) : (
-              team[0].members.slice().sort((a, b) => b.score - a.score).map(
+              <Brief>游戏总时长约为{totalMinutes}分钟</Brief>
+            </Item>
+          </List>
+          <List renderHeader={'得分榜'}>
+            {isTeam ? (
+              team.slice().sort((a, b) => b.score - a.score).map(
                 v => <Item
                   key={v._id}
                   arrow="horizontal"
                   platform="android"
-                  onClick={() => this.showScoreAction(isTeam, isAdmin, v._id)}>
-                  <Badge overflowCount={OVERFLOW_COUNT} text={v.score || '0'} />
-                  {v.nickname}
+                  onClick={() => this.showScoreAction(isTeam, isAdmin, v._id, v.team)}>
+                  <Badge overflowCount={OVERFLOW_COUNT} text={v.teamScore || '0'} />
+                  {v.team}({v.members.length}人){isPlayer && v._id === isPlayer._id ? '(当前队伍)' : null}
+
                 </Item>)
-            )}
-        </List>
-        {isAdmin ? (
-          <List renderHeader={'游戏管理'}>
-            {status === 'waiting' ?
-              <Item>
-                <Button type="primary" onClick={this.startGame}>开始游戏</Button>
-              </Item> : null}
-            {status === 'gaming' ?
-              <Item>
-                <Button type="warning" onClick={this.endGame}>结束游戏</Button>
-              </Item> : null}
-          </List>) : null}
-        {isAdmin ? (
-          <List renderHeader={'团队管理'}>
-            <Item>
-              <Button onClick={this.createTeam}>新增团队</Button>
-            </Item>
-          </List>) : null}
-        {isOwner ? null : (
-          <List>
-            <Item>
-              <Button type="warning" onClick={this.wannaExit}>退出游戏</Button>
-            </Item>
+            ) : (
+                team[0].members.slice().sort((a, b) => b.score - a.score).map(
+                  v => <Item
+                    key={v._id}
+                    arrow="horizontal"
+                    platform="android"
+                    onClick={() => this.showScoreAction(isTeam, isAdmin, v._id)}>
+                    <Badge overflowCount={OVERFLOW_COUNT} text={v.score || '0'} />
+                    {v.nickname}
+                  </Item>)
+              )}
           </List>
-        )}
+          {isAdmin ? (
+            <List renderHeader={'游戏管理'}>
+              {status === 'waiting' ?
+                <Item>
+                  <Button type="primary" onClick={this.startGame}>开始游戏</Button>
+                </Item> : null}
+              {status === 'gaming' ?
+                <Item>
+                  <Button type="warning" onClick={this.endGame}>结束游戏</Button>
+                </Item> : null}
+            </List>) : null}
+          {isAdmin ? (
+            <List renderHeader={'团队管理'}>
+              <Item>
+                <Button onClick={this.createTeam}>新增团队</Button>
+              </Item>
+            </List>) : null}
+          {isOwner ? null : (
+            <List>
+              <Item>
+                <Button type="warning" onClick={this.wannaExit}>退出游戏</Button>
+              </Item>
+            </List>
+          )}
+        </div>
       </div>
     );
   }

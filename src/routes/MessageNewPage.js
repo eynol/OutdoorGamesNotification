@@ -121,12 +121,13 @@ class MessagePage extends React.Component {
     }
 
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           icon={<Icon type="left" />}
           onLeftClick={() => dispatch(routerRedux.go(-1))}
         >新建推送</NavBar>
-        <div>
+        <div className="content">
           <List renderHeader="推送内容">
             <TextareaItem
               rows="5"

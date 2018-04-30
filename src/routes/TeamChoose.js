@@ -45,32 +45,35 @@ class TeamChoose extends React.Component {
       return (<Redirect replace from="/chooseteam" to="/games" />)
     }
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
         >选择游戏团队</NavBar>
-        {currentGame && (
-          <Fragment>
-            <List renderHeader={'请从下方选择一个团队'}>
-              {team && team.length ? (
-                <Fragment>
-                  {team.map(
-                    (joinList, index) => <RadioItem
-                      key={joinList._id}
-                      checked={this.state.team === joinList._id}
-                      onChange={()=>this.chooseTeam(joinList._id)}
-                    >{joinList.team}</RadioItem>)}
-                  <WhiteSpace />
-                  <WingBlank><Button type="primary" onClick={this.submit} disabled={!this.state.team}>加入该团队</Button></WingBlank>
-                  <WhiteSpace />
-                  <WingBlank><Button onClick={this.refresh}>刷新</Button></WingBlank>
-                  <WhiteSpace />
-                </Fragment>
-              ) : (
-                  <Button onClick={this.refresh}>刷新</Button>
-                )}
-            </List>
-          </Fragment>)
-        }
+        <div className="content">
+          {currentGame && (
+            <Fragment>
+              <List renderHeader={'请从下方选择一个团队'}>
+                {team && team.length ? (
+                  <Fragment>
+                    {team.map(
+                      (joinList, index) => <RadioItem
+                        key={joinList._id}
+                        checked={this.state.team === joinList._id}
+                        onChange={() => this.chooseTeam(joinList._id)}
+                      >{joinList.team}</RadioItem>)}
+                    <WhiteSpace />
+                    <WingBlank><Button type="primary" onClick={this.submit} disabled={!this.state.team}>加入该团队</Button></WingBlank>
+                    <WhiteSpace />
+                    <WingBlank><Button onClick={this.refresh}>刷新</Button></WingBlank>
+                    <WhiteSpace />
+                  </Fragment>
+                ) : (
+                    <Button onClick={this.refresh}>刷新</Button>
+                  )}
+              </List>
+            </Fragment>)
+          }
+        </div>
       </div>
     );
   }

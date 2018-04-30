@@ -20,18 +20,21 @@ class MessagePage extends React.Component {
     const { messages, games, user } = this.props;
 
     return (
-      <div>
+      <div className="frame">
         <NavBar mode="light"
+          className="o-navbar"
           rightContent={games.gaming ? [
             <Link to="/messages/new" key="0" className="iconfont icon-27CIRCLE" style={{ width: 22 }} />
           ] : null}
         >推送信息</NavBar>
-        {games.gaming ? (<div>{messages.messages.map(msg => <MessageBox data={msg} />)}</div>) : (
-          <Fragment>
-            <WingBlank><p>请先加入游戏才能看到推送消息</p></WingBlank>
-            <WingBlank><Link to="/games"><Button>查看所有游戏</Button></Link></WingBlank>
-          </Fragment>
-        )}
+        <div className="content">
+          {games.gaming ? (<div>{messages.messages.map(msg => <MessageBox data={msg} />)}</div>) : (
+            <Fragment>
+              <WingBlank><p>请先加入游戏才能看到推送消息</p></WingBlank>
+              <WingBlank><Link to="/games"><Button>查看所有游戏</Button></Link></WingBlank>
+            </Fragment>
+          )}
+        </div>
       </div>
     );
   }
