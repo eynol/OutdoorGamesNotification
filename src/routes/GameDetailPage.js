@@ -156,7 +156,7 @@ class GameDetailPage extends React.Component {
             </List>
             <List renderHeader={'备注'}>
               <Item multipleLine>
-                {currentGame.additions}
+                <p>{currentGame.additions}</p>
               </Item>
             </List>
             <List renderHeader={'游戏类型'}>

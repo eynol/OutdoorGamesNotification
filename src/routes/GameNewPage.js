@@ -119,7 +119,7 @@ class NewGamePage extends React.Component {
                     { max: 500, message: '游戏描述长度不能超过500个字符' }
                   ],
                 }) }
-
+                rows="3"
                 title="游戏描述"
                 autoHeight
                 placeholder="请输入游戏描述"
@@ -141,7 +141,7 @@ class NewGamePage extends React.Component {
                     { max: 2000, message: '游戏规则长度不能超过2000个字符' }
                   ],
                 }) }
-
+                rows="3"
                 title="游戏规则"
                 autoHeight
                 placeholder="请输入游戏规则"
@@ -193,7 +193,7 @@ class NewGamePage extends React.Component {
                     { max: 500, message: '备注长度不能超过500个字符' }
                   ],
                 }) }
-
+                rows="3"
                 title="备注"
                 autoHeight
                 placeholder="请输入备注"

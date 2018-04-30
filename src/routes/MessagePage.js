@@ -9,32 +9,11 @@ import {
 } from 'antd-mobile';
 
 
+import MessageBox from '../components/MessageBox';
+
 const Fragment = React.Fragment;
 
 class MessagePage extends React.Component {
-  chooseMessageType = () => {
-    Modal.alert('新增推送消息', '请选择您要发送的消息类型', [
-      {
-        text: '所有人',
-        onPress: () => { }
-      },
-      {
-        text: '仅团队内',
-        onPress: () => {
-
-        }
-      },
-      {
-        text: '悄悄话',
-        onPress: () => {
-
-        }
-      },
-      {
-        text: '取消'
-      }
-    ])
-  }
 
   render() {
 
@@ -44,11 +23,10 @@ class MessagePage extends React.Component {
       <div>
         <NavBar mode="light"
           rightContent={games.gaming ? [
-            <div key="0" onClick={this.chooseMessageType}
-              className="iconfont icon-27CIRCLE" style={{ width: 22 }} />
+            <Link to="/messages/new" key="0" className="iconfont icon-27CIRCLE" style={{ width: 22 }} />
           ] : null}
         >推送信息</NavBar>
-        {games.gaming ? (<div>gaming</div>) : (
+        {games.gaming ? (<div>{messages.messages.map(msg => <MessageBox data={msg} />)}</div>) : (
           <Fragment>
             <WingBlank><p>请先加入游戏才能看到推送消息</p></WingBlank>
             <WingBlank><Link to="/games"><Button>查看所有游戏</Button></Link></WingBlank>

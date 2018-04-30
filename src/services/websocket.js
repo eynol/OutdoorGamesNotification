@@ -17,7 +17,11 @@ export function send(json) {
   }
 }
 
-export function connect(user_id, tempUser) {
+export function joinGame(gid) {
+  send({ type: 'joinGame', gid })
+}
+
+export function connect(user_id, game_id) {
   if (connection) {
     return Promise.resolve();
   } else {
@@ -26,9 +30,14 @@ export function connect(user_id, tempUser) {
     }
     return new Promise((resolve, reject) => {
 
-      const host = window.location.hostname+':3000';
-
-      const ws = new WebSocket('ws://'+host);
+      const host = window.location.hostname + ':3000';
+      let ws;
+      try {
+        ws = new WebSocket('ws://' + host);
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
 
       ws.onopen = function open() {
         connection = ws;
@@ -39,10 +48,15 @@ export function connect(user_id, tempUser) {
       };
 
 
-      ws.onclose = function close(code, reason) {
+      ws.onclose = function close(event) {
         connection = null;
         clearInterval(heartbeatTimmer);
-        console.log('disconnected', code, reason);
+        setTimeout(() => {
+          for (let action of subscribers.values()) {
+            action({ type: 'closed', event });
+          }
+        }, 4)
+        console.log('disconnected', event);
       };
 
 
@@ -76,9 +90,9 @@ export function connect(user_id, tempUser) {
                 const encrypted = encode(fingerprint, 'websocket', '/', ws.$$session);
                 // const encrypted = encode.sha256(fingerprint + ws.$$session);
 
-                console.log(fingerprint, encrypted, ws.$$session);
+                console.log('fingerprint', fingerprint, encrypted, ws.$$session);
                 ret.uid = user_id;
-                ret.tempUser = tempUser;
+                ret.gid = game_id;
                 ret.token = encrypted;
 
                 ws.send(JSON.stringify(ret));
@@ -90,6 +104,12 @@ export function connect(user_id, tempUser) {
             case 'auth-3': {
               if (data.result === 'ok') {
                 resolve();
+
+                setTimeout(() => {
+                  for (let action of subscribers.values()) {
+                    action({ type: 'connected' });
+                  }
+                }, 4);
               } else {
                 reject(data.result);
               }
@@ -98,7 +118,6 @@ export function connect(user_id, tempUser) {
 
             default: {//default is ping
               for (let action of subscribers.values()) {
-                console.log(action);
                 action(data);
               }
             }
@@ -155,11 +174,11 @@ export function listen(action) {
 export function unlisten() {
 
   subscribers.delete(this.id);
-  close()
+  close('unlisten')
 }
-export function close() {
+export function close(reason) {
   if (connection) {
-    connection.close(1000, '=');
+    connection.close(1000, reason || '=');
     connection = null;
   }
 }

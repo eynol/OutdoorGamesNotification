@@ -7,6 +7,7 @@ import KeepConnectionAlive from '../components/KeepConnectionAlive';
 
 import GamesPage from './GamesPage';
 import MessagePage from './MessagePage';
+import MessageNewPage from './MessageNewPage';
 import SettingPage from './SettingPage';
 
 import GameNewPage from './GameNewPage';
@@ -24,7 +25,7 @@ import SignUpPage from './SignUpPage';
 import { ActivityIndicator } from 'antd-mobile';
 
 
-function App({ loading ,ui}) {
+function App({ loading, ui }) {
   return (
     <div className={styles.frame}>
       <ActivityIndicator
@@ -39,6 +40,7 @@ function App({ loading ,ui}) {
         <Route path="/games/new" exact component={GameNewPage} />
         <Route path="/games/detail/:gid" exact component={GameDetailPage} />
         <Route path="/messages" exact component={MessagePage} />
+        <Route path="/messages/new" exact component={MessageNewPage} />
         <Route path="/chooseteam" exact component={TeamChoose} />
         <Route path="/gaming" exact component={GamingPage} />
         <Route path="/gaming/detail" exact component={GameDetailPage} />
@@ -48,21 +50,21 @@ function App({ loading ,ui}) {
         <Route path="/signin" exact component={SignInPage} />
         <Route path="/signup" exact component={SignUpPage} />
       </div>
-      {ui.appbar?(
+      {ui.appbar ? (
         <div className={styles.appbar}>
-        <AppBar />
-      </div>)
-      :null}
+          <AppBar />
+        </div>)
+        : null}
 
     </div>
   );
 }
 
 function mapStateToProps(state) {
-
+  console.log('games:', state);
   return {
     loading: state.loading.global,
-    ui:state.ui,
+    ui: state.ui,
   }
 }
 

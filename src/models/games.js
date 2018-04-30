@@ -30,7 +30,7 @@ export default {
 
         if (pathname === "/games") {
           dispatch({ type: 'fetch' });
-        } else if (pathname === '/gaming') {
+        } else if (['/gaming'].includes(pathname)) {
           dispatch({ type: 'gamingCheck' });
         } else {
           let match = pathToRegexp('/games/detail/:gid').exec(pathname);
@@ -76,6 +76,7 @@ export default {
   },
 
   effects: {
+
     *fetch({ payload: gamelist }, { call, put, select }) {  // eslint-disable-line
 
       //1.判断当前是否在游戏中，如果是，则跳转至gaming页面。
@@ -207,7 +208,9 @@ export default {
       let currentGame = games.currentGame;
 
       console.log('gamecheck');
-
+      if (!online) {
+        return;
+      }
       if (games.gaming) {
         if (!uid) {
           //没有id，关闭游戏
@@ -233,10 +236,11 @@ export default {
             console.log('current', currentGame);
             //有当前游戏，检查当前游戏自己的身份
             let isAdmin = currentGame.owner === uid || currentGame.allowedAdmins.includes(uid);
-            console.log('isAdmin', isAdmin);
+            console.log('-----------------isAdmin', isAdmin);
             if (isAdmin) {
               //是管理员
               yield ws.connect(uid);
+              ws.joinGame(currentGame._id)
               yield yield put({ type: 'getJoinList', payload: currentGame._id });
             } else {
               //获取参与列表检查是否是参与游戏的玩家
@@ -247,9 +251,10 @@ export default {
                   member => member._id === uid
                 )
               );
-
+              console.log('-----------------inTeam', inTeam);
               if (inTeam) {
                 yield ws.connect(uid);
+                ws.joinGame(currentGame._id)
                 yield yield put({ type: 'save', payload: data });
               } else {
                 Toast.fail('未在游戏列表中，请重新加入游戏');
@@ -288,7 +293,7 @@ export default {
           if (err) {
             Toast.fail(err.message);
           } else {
-
+            ws.joinGame(currentGame._id)
             yield put(routerRedux.goBack())
             yield put({ type: 'enterGame' });
             yield put(routerRedux.replace({ pathname: '/gaming' }));
@@ -309,7 +314,7 @@ export default {
           if (err) {
             Toast.fail(err.message);
           } else {
-
+            ws.joinGame(currentGame._id)
             yield put({ type: 'save', payload: { team: data.team } });
             yield put({ type: 'store' });
             yield put(routerRedux.goBack())
@@ -395,6 +400,7 @@ export default {
       const { result } = yield take('ASSISTANT_RESP');
 
       if (result === 'ok') {
+        ws.joinGame(gid)
         yield put(routerRedux.goBack())
         yield put({ type: 'enterGame' });
         yield put(routerRedux.replace({ pathname: '/gaming' }));
@@ -404,7 +410,7 @@ export default {
     },
     *gameover({ payload }, { call, put }) {
 
-      ws.close();
+      ws.close('gameover');
 
       yield put({
         type: 'save', payload: {
