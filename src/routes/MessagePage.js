@@ -1,9 +1,14 @@
 import React from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
+
+import Observer from 'react-intersection-observer'
+
+
 import {
   NavBar,
   WingBlank,
+  WhiteSpace,
   Button,
   Modal,
   ActionSheet,
@@ -16,12 +21,24 @@ import ScrollToButtom from '../components/ScrollToButtom';
 const Fragment = React.Fragment;
 
 class MessagePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      top: 0,
+      scrollToButtom: false
+    }
 
+  }
+  handleScrollBTN = (scrollToButtom) => {
+    this.setState({ scrollToButtom })
+  }
   onDoubleClick = (event) => {
     const dataset = event.target.dataset;
 
     const createdAt = dataset['createdAt'];
     const mid = dataset['mid'];
+    const { user: { _id: uid }, dispatch } = this.props
+
 
     const now = new Date();
     const createdDate = new Date(createdAt);
@@ -33,7 +50,7 @@ class MessagePage extends React.Component {
         {
           text: '立即撤回',
           onPress: () => {
-            Modal.alert('cehui')
+            dispatch({ type: 'messages/drop', payload: mid })
           }
         }
       ])
@@ -45,43 +62,26 @@ class MessagePage extends React.Component {
       this.buttom.scrollIntoView({ behavior: 'smooth' })
     }
   }
-  componentDidMount() {
-    this.setState({
-      height: this.content.scrollHeight,
-      top: this.content.scrollTop,
-      viewHeight: this.content.clientHeight,
+  handleReadMessage = (params) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'messages/read',
+      payload: params
     });
-
+  }
+  componentDidMount() {
     const { state } = this.props.location;
     if (state && state.bottom) {
       this.scrollToButtom();
     }
+  }
 
-    this.content.addEventListener('scroll', this.updateScroll);
 
-    console.log('---------location------------');
-    console.log(this.props.location.state);
-  }
-  componentWillUnmount() {
-    this.content.removeEventListener('scroll', this.updateScroll)
-  }
-  updateScroll = () => {
-    const { top, height } = this.state;
-    const $top = this.content.scrollTop;
-    const $height = this.content.scrollHeight;
-    if (top !== $top || height !== $height) {
-      this.setState({ top: $top, height: $height });
-    }
-  }
-  componentWillReceiveProps(next, b) {
-    console.log(next, b);
-    if (this.content) {
-      console.log(this.content.scrollTop, this.content.scrollHeight);
-    }
 
-  }
   componentDidUpdate() {
-    console.log(this.content.scrollTop, this.content.scrollHeight, this.state);
+    if (!this.state.scrollToButtom) {
+      this.scrollToButtom();
+    }
   }
   render() {
 
@@ -104,6 +104,7 @@ class MessagePage extends React.Component {
                   data={msg}
                   key={msg._id}
                   onDoubleClick={this.onDoubleClick}
+                  onRead={this.handleReadMessage}
                   uid={uid}
                   currentGame={currentGame}
                 />))}
@@ -113,7 +114,8 @@ class MessagePage extends React.Component {
                 <WingBlank><Link to="/games"><Button>查看所有游戏</Button></Link></WingBlank>
               </Fragment>
             )}
-          <ScrollToButtom onClick={this.scrollToButtom} />
+          <Observer onChange={inview => this.handleScrollBTN(!inview)}><WhiteSpace /></Observer>
+          <ScrollToButtom active={this.state.scrollToButtom} onClick={this.scrollToButtom} />
           <div ref={node => this.buttom = node}></div>
         </div>
       </div >

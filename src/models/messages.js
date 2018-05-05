@@ -113,17 +113,18 @@ export default {
       }
 
     },
-    *read({ payload: { mid, uid } }, { put }) {
-      const { data, err } = yield request('/api/messages/read', {
+    read({ payload: { mid, uid } }, { put }) {
+      ws.send({ type: 'read', body: { mid, uid } })
+    },
+    *drop({ payload: mid }, { put }) {
+      const { data, err } = yield request('/api/messages/drop', {
         method: 'post',
-        body: { mid, uid }
+        body: { mid }
       });
-
       if (err) {
-        console.error(err.message || err)
         Toast.fail(err.message || err);
       } else {
-        yield put({ type: 'readOne', payload: { mid, uid } });
+        yield put({ type: 'dropOne', payload: mid });
       }
     },
     *push({ payload: message }, { put, take }) {
@@ -160,7 +161,7 @@ export default {
     setuid(state, { uid }) {
       return { ...state, uid }
     },
-    readOne(state, { uid, mid }) {
+    readOne(state, { payload: { uid, mid } }) {
       const messages = state.messages.slice();
       const $message = messages.find(msg => msg._id === mid);
       if ($message) {
@@ -193,13 +194,12 @@ export default {
       const $state = { ...state, messages };
       return $state;
     },
-    drop(state, { payload: mid }) {
+    dropOne(state, { payload: mid }) {
       const messages = state.messages.slice();
       const target = messages.find(m => m._id === mid);
       if (target) {
         target.drop = true;
       }
-
       state.unread.delete(mid)
       return { ...state, messages }
     },
@@ -209,7 +209,8 @@ export default {
       $state.messages.forEach(msg => {
         if (msg) {
           const r = msg.reciever.find(r => r._id === uid);
-          if (r && r.read === false) {
+          console.log(r, r && r.read === false);
+          if (r && r.read === false && r.drop === false) {
             $state.unread.add(msg._id);
           }
         }

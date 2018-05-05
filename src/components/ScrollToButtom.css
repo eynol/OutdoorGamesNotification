@@ -1,22 +1,27 @@
 .container {
-    position: fixed;
-    width: 100%;
-    bottom: 60px;
-    text-align: center;
-    left: 0;
+  position: fixed;
+  width: 100%;
+  bottom: 60px;
+  text-align: center;
+  left: 0;
 }
 
 .btn {
-    display: inline-block;
-    cursor: pointer;
-    line-height: 30px;
-    border-radius: 60px;
-    background-color: #fff;
-    padding: 6px 10px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, .11), -1px 0px 4px rgba(0, 0, 0, .07);
-    transition: .3s;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 30px;
+  border-radius: 60px;
+  background-color: #fff;
+  padding: 6px 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .11), -1px 0px 4px rgba(0, 0, 0, .07);
+  transition:  .3s ease-out;
+  transform: translateY(70px);
+}
+
+.show .btn {
+  transform: translateY(0);
 }
 
 .btn:active {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .13), 0px 2px 4px rgba(0, 0, 0, .09);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .13), 0px 2px 4px rgba(0, 0, 0, .09);
 }

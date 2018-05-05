@@ -1,9 +1,11 @@
 import React from 'react';
-import { container, btn } from './ScrollToButtom.css';
+import { container, btn, show } from './ScrollToButtom.css';
+import classNames from 'classnames';
 
-function ScrollToButtom({ onClick }) {
+
+function ScrollToButtom({ active, onClick }) {
   return (
-    <div className={container}>
+    <div className={classNames([container, active ? show : null])}>
       <div className={btn} onClick={onClick}>
         滚动到底部
       </div>

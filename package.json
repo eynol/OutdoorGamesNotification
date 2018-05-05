@@ -14,11 +14,13 @@
     "dva": "^2.1.0",
     "dva-loading": "^1.0.4",
     "fingerprintjs2": "^1.6.1",
+    "intersection-observer": "^0.5.0",
     "isomorphic-ws": "^4.0.0",
     "path-to-regexp": "^2.2.0",
     "rc-form": "^2.2.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-intersection-observer": "^3.0.3",
     "uuid-js": "^0.7.5"
   },
   "devDependencies": {

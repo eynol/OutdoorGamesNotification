@@ -10,3 +10,10 @@ body{
   max-width: 700px;
   margin: 0 auto;
 }
+
+:global(a){
+  color:#333;
+}
+:global(.am-navbar) :global(a){
+  color: #108ee9;
+}
