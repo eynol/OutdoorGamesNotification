@@ -40,20 +40,23 @@ class GameDetailPage extends React.Component {
 
 
 
-  showScoreAction = (isTeam, isAdmin, teamid, teamname) => {
+  showScoreAction = (isTeam, isAdmin, { teamid, uid }, teamname) => {
 
     console.log(isTeam, isAdmin)
     const { dispatch, user, games } = this.props;
-    const uid = user._id;
     const { team, currentGame } = games;
     const gid = currentGame._id;
     const isPlayer = team.find(t => t.members.find(member => member._id === user._id))
     const isCurrentTeam = isPlayer && teamid === isPlayer._id;
     const originteam = isPlayer && isPlayer._id;
-
+    const isFinished = currentGame.status === 'finished';
 
     if (isTeam) {
       if (isAdmin) {
+        if (isFinished) {
+          Toast.fail('游戏已经结束了，无法修改');
+          return;
+        }
         ActionSheet.showActionSheetWithOptions({
           options: ['奖励得分', '惩罚减分', '修改团队名称', '删除团队', '取消'],
           destructiveButtonIndex: 3,
@@ -121,6 +124,10 @@ class GameDetailPage extends React.Component {
               break;
             }
             case 3: {
+              if (isFinished) {
+                Toast.fail('游戏已经结束了，无法删除团队')
+                return;
+              }
               Modal.alert('确定删除该团队？', '团队人数不为零时不能删除', [
                 { text: '取消' },
                 {
@@ -134,6 +141,9 @@ class GameDetailPage extends React.Component {
           }
         });
       } else {
+        if (isFinished) {
+          return;
+        }
         ActionSheet.showActionSheetWithOptions({
           options: ['切换至该团队', '修改团队名称', '取消'],
           cancelButtonIndex: 2,
@@ -173,6 +183,10 @@ class GameDetailPage extends React.Component {
       }
     } else {
       if (isAdmin) {
+        if (isFinished) {
+          Toast.fail('游戏已经结束了，无法修改');
+          return;
+        }
         ActionSheet.showActionSheetWithOptions({
           options: ['奖励得分', '惩罚减分', '取消'],
           cancelButtonIndex: 2,
@@ -200,6 +214,7 @@ class GameDetailPage extends React.Component {
                               isTeam: !!isTeam,
                               teamid,
                               uid,
+                              gid,
                               reason,
                               score,
                             }
@@ -212,7 +227,7 @@ class GameDetailPage extends React.Component {
           }
         });
       } else {
-        Toast.success('yooo');
+
       }
     }
   }
@@ -257,6 +272,23 @@ class GameDetailPage extends React.Component {
     const { dispatch } = this.props;
     dispatch({ type: 'games/endGame' });
   }
+  disconnectToGame = () => {
+    const { dispatch, games: { currentGame: { owner, allowedAdmins, status } }, user: { _id: uid } } = this.props;
+    const isAdmin = owner === uid || allowedAdmins.includes(uid);
+    const unFinished = status !== 'finished';
+    if (isAdmin && unFinished) {
+      Modal.alert('游戏未结束','暂时无法离开游戏，游戏结束后可以离开')
+    } else {
+      Modal.alert('您确定要断开游戏？', '断开游戏后，您的可以再次进入游戏',
+        [{ text: '取消' },
+        {
+          text: '断开游戏', onPress: () => {
+            dispatch({ type: 'games/gameover' })
+          }
+        }]);
+    }
+
+  }
   render() {
     const { dispatch, games, user } = this.props;
     const currentGame = games.currentGame;
@@ -293,7 +325,7 @@ class GameDetailPage extends React.Component {
             <Link to="/gaming/detail" key="0" className="iconfont icon-info" style={{ width: 22, marginLeft: 5 }} />,
           ]}
           icon={<Icon type="left" />}
-          onLeftClick={() => dispatch(routerRedux.go(-1))}
+          onLeftClick={this.disconnectToGame}
         >当前游戏状态</NavBar>
         <NoticeBar marqueeProps={{ loop: true, style: { padding: '0 7.5px' } }}>
           <MyGameNoticeBar {...noticeProps} />
@@ -322,24 +354,24 @@ class GameDetailPage extends React.Component {
                   key={v._id}
                   arrow="horizontal"
                   platform="android"
-                  onClick={() => this.showScoreAction(isTeam, isAdmin, v._id, v.team)}>
+                  onClick={() => this.showScoreAction(isTeam, isAdmin, { teamid: v._id }, v.team)}>
                   <Badge overflowCount={OVERFLOW_COUNT} text={v.teamScore || '0'} />
                   {v.team}({v.members.length}人){isPlayer && v._id === isPlayer._id ? '(当前队伍)' : null}
 
                 </Item>)
             ) : (
-                team[0].members.slice().sort((a, b) => b.score - a.score).map(
+                team.length && team[0].members.slice().sort((a, b) => b.score - a.score).map(
                   v => <Item
                     key={v._id}
                     arrow="horizontal"
                     platform="android"
-                    onClick={() => this.showScoreAction(isTeam, isAdmin, v._id)}>
+                    onClick={() => this.showScoreAction(isTeam, isAdmin, { uid: v._id, teamid: team[0]._id })}>
                     <Badge overflowCount={OVERFLOW_COUNT} text={v.score || '0'} />
                     {v.nickname}
                   </Item>)
               )}
           </List>
-          {isAdmin ? (
+          {isAdmin && status !== 'finished' ? (
             <List renderHeader={'游戏管理'}>
               {status === 'waiting' ?
                 <Item>
@@ -350,7 +382,7 @@ class GameDetailPage extends React.Component {
                   <Button type="warning" onClick={this.endGame}>结束游戏</Button>
                 </Item> : null}
             </List>) : null}
-          {isAdmin ? (
+          {isTeam && isAdmin && status !== 'finished' ? (
             <List renderHeader={'团队管理'}>
               <Item>
                 <Button onClick={this.createTeam}>新增团队</Button>

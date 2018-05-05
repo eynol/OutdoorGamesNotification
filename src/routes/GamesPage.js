@@ -12,6 +12,10 @@ import {
 const Item = List.Item;
 const Brief = Item.Brief;
 
+
+const GAME_STATUS = { waiting: '游戏准备中', gaming: '游戏已经开始', finished: '游戏已经结束' };
+
+
 class GamesPage extends React.Component {
   render() {
     const { games } = this.props;
@@ -39,7 +43,7 @@ class GamesPage extends React.Component {
                 <Link to={`/games/detail/${game._id}`}>
                   {game.title}<Brief>{game.desc}</Brief>
                   <Brief>{game.location}</Brief>
-                  <Brief>游戏准备中</Brief>
+                  <Brief>{GAME_STATUS[game.status]}</Brief>
                 </Link>
               </Item>);
             })

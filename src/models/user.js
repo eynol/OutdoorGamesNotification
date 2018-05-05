@@ -46,13 +46,17 @@ export default {
           console.log('err', err)
           throw err;
         } else {
-          yield put({
-            type: 'save',
-            payload: data.user,
-          });
-          yield put({ type: 'store' });
-          yield put(routerRedux.goBack())
-          Toast.success('登录成功！', 1);
+          if (data.fromhttp === 1 && data.status !== 200) {
+            throw data;
+          } else {
+            yield put({
+              type: 'save',
+              payload: data.user,
+            });
+            yield put({ type: 'store' });
+            yield put(routerRedux.goBack())
+            Toast.success('登录成功！', 1);
+          }
         }
       } catch (e) {
         Toast.fail(e.message, 2);
@@ -74,13 +78,17 @@ export default {
         } else if (data.status !== 200) {
           Toast.fail(data.message, 2);
         } else {
-          yield put({
-            type: 'save',
-            payload: data.user,
-          });
-          yield put({ type: 'store' });
-          yield put(routerRedux.goBack())
-          Toast.success('注册成功！', 1);
+          if (data.fromhttp === 1 && data.status !== 200) {
+            throw data;
+          } else {
+            yield put({
+              type: 'save',
+              payload: data.user,
+            });
+            yield put({ type: 'store' });
+            yield put(routerRedux.goBack())
+            Toast.success('注册成功！', 1);
+          }
         }
       } catch (e) {
         Toast.fail(e.message, 2);

@@ -41,6 +41,7 @@ class TeamChoose extends React.Component {
 
     const { tempUser } = location.state || {};;
 
+    console.log('teamchose--------', currentGame, location.state);
     if (!currentGame) {
       return (<Redirect replace from="/chooseteam" to="/games" />)
     }

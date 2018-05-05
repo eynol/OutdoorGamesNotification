@@ -25,10 +25,11 @@ export function getTimeStr(num, stringType = 'yyyy年MM月dd日 HH:mm') {
     const date = toDateSafe(num);
 
     let ret = stringType.replace('yyyy', date.getFullYear());
-    ret = ret.replace('MM', date.getMonth());
-    ret = ret.replace('dd', date.getDate());
+    ret = ret.replace('MM', _0(date.getMonth()));
+    ret = ret.replace('dd', _0(date.getDate()));
     ret = ret.replace('HH', _0(date.getHours()));
     ret = ret.replace('mm', _0(date.getMinutes()));
+    ret = ret.replace('ss', _0(date.getSeconds()));
 
     return ret
   } catch (e) {

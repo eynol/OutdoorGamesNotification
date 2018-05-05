@@ -34,6 +34,10 @@ export function connect(user_id, game_id) {
       let ws;
       try {
         ws = new WebSocket('ws://' + host);
+        ws.onerror = function (e){
+          console.error(e);
+          reject(e);
+        }
       } catch (e) {
         console.error(e);
         reject(e);
@@ -62,7 +66,7 @@ export function connect(user_id, game_id) {
 
       ws.onmessage = function incoming({ data }) {
 
-        console.log('message:', data)
+        // console.log('message:', data)
         if (data === 'ping') {
           ws.send('pong');
           return;

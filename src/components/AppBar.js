@@ -17,7 +17,7 @@ class TabBarExample extends React.Component {
   }
 
   render() {
-    const { location, dispatch } = this.props;
+    const { location, dispatch, messages } = this.props;
     const pathname = location.pathname;
     return (
       <TabBar
@@ -42,6 +42,7 @@ class TabBarExample extends React.Component {
           selectedIcon={<div className="iconfont icon-message" />}
           title="消息推送"
           key="messages"
+          dot={messages.unread.size > 0}
           selected={MESSAGE_REG.test(pathname)}
           onPress={() => {
             dispatch(routerRedux.push({ pathname: '/messages' }));

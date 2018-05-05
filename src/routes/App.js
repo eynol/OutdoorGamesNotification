@@ -25,7 +25,7 @@ import SignUpPage from './SignUpPage';
 import { ActivityIndicator } from 'antd-mobile';
 
 
-function App({ loading, ui }) {
+function App({ loading, ui, messages }) {
   return (
     <div className={'app-frame'}>
       <ActivityIndicator
@@ -52,7 +52,7 @@ function App({ loading, ui }) {
       </div>
       {ui.appbar ? (
         <div className={'appbar'}>
-          <AppBar />
+          <AppBar messages={messages} />
         </div>)
         : null}
 
@@ -61,10 +61,10 @@ function App({ loading, ui }) {
 }
 
 function mapStateToProps(state) {
-  console.log('games:', state);
   return {
     loading: state.loading.global,
     ui: state.ui,
+    messages: state.messages,
   }
 }
 

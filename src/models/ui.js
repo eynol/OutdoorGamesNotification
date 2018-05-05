@@ -1,4 +1,6 @@
 
+import * as ws from '../services/websocket';
+
 export default {
 
   namespace: 'ui',
@@ -17,6 +19,13 @@ export default {
         }
       })
     },
+    websocket({ dispatch }) {
+      return ws.listen(msg => {
+        if (msg.type === 'dispatch') {
+          dispatch(msg.action);
+        }
+      })
+    }
   },
 
   effects: {

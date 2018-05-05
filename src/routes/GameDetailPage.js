@@ -27,7 +27,7 @@ const JOIN_TYPE = {
 
 const STATUS_TYPE = {
   waiting: '等待中',
-  gaimg: '游戏中',
+  gaming: '游戏中',
   finished: '游戏已经结束',
 };
 
@@ -88,6 +88,13 @@ class GameDetailPage extends React.Component {
       ])
     }
   }
+
+  enterGame = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: 'games/enterGame' });
+    dispatch(routerRedux.replace({ pathname: '/gaming' }))
+
+  }
   requestAssistant = () => {
     const { user, dispatch, games } = this.props;
     if (user.online) {
@@ -123,6 +130,9 @@ class GameDetailPage extends React.Component {
     if (/^\/games/.test(pathname) && gaming) {
       return <Redirect to='/gaming' />
     }
+    const uid = user._id;
+    const isAdmin = currentGame && (currentGame.owner === uid || currentGame.allowedAdmins.includes(uid));
+
 
     return (
       <div className="frame">
@@ -171,16 +181,17 @@ class GameDetailPage extends React.Component {
                   <List renderHeader={'操作'}>
                     <Item extra={<Button size="small"
                       type="primary"
-                      disabled={currentGame.status === 'finished'}
                       onClick={this.joinGame}>加入游戏</Button>}>
                       我是玩家
                   <Brief>将作为玩家参与到游戏中</Brief>
                     </Item>
-                    <Item extra={<Button size="small" type="primary"
-                      disabled={currentGame.status === 'finished'}
-                      onClick={this.requestAssistant}>申请管理</Button>}>
+                    <Item extra={isAdmin
+                      ? <Button size="small" type="primary"
+                        onClick={this.enterGame}>进入游戏</Button>
+                      : <Button size="small" type="primary"
+                        onClick={this.requestAssistant}>申请管理</Button>}>
                       我是工作人员
-                  <Brief>将作为工作人员协助游戏管理</Brief>
+                    <Brief>将作为工作人员协助游戏管理</Brief>
                     </Item>
                   </List>
                 )}
